@@ -1,0 +1,3 @@
+# 2026-11-08T16:27:50Z - out-of-band change: BigQuery API datasets.patch on g07_silver (not Terraform)
+$ PATCH https://bigquery.googleapis.com/bigquery/v2/projects/data-engineering-i1/datasets/g07_silver  body={"labels":{"drift":"test"}}
+labels now: {'drift': 'test'} | lastModifiedTime: 1794155270719

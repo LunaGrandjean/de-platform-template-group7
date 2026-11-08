@@ -1,0 +1,3 @@
+# 2026-11-08T16:29:01Z - out-of-band change on a MANAGED attribute: label step on g07_bronze (simulated console hotfix)
+$ PATCH .../datasets/g07_bronze  body={"labels":{"step":"hotfix"}}
+labels now: {'group': 'g07', 'layer': 'bronze', 'step': 'hotfix'}

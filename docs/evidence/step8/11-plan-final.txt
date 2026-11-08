@@ -1,0 +1,23 @@
+google_bigquery_dataset.silver: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_silver]
+google_storage_bucket.bronze: Refreshing state... [id=data-engineering-i1-marketplace-group]
+google_bigquery_dataset.gold: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_gold]
+google_bigquery_dataset.bronze: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze]
+google_bigquery_dataset.warehouse: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse]
+google_bigquery_dataset_iam_member.gold_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_gold/roles/bigquery.dataOwner/user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.silver_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_silver/roles/bigquery.dataOwner/user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataOwner/user:egadenne@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataOwner/user:egadenne@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:oabdellatif@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:oabdellatif@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:lgrandjean@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:lgrandjean@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:msaoudi@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:msaoudi@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:amohamed@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:amohamed@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:amohamed@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:amohamed@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:lgrandjean@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:lgrandjean@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:oabdellatif@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:oabdellatif@albertschool.com]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+plan exit code: 0

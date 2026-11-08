@@ -1,0 +1,3 @@
+# 2026-11-08T16:29:20Z - cleanup: remove the unmanaged label drift=test from g07_silver (Terraform does not manage silver labels, so it cannot remove it)
+$ PATCH .../datasets/g07_silver  body={"labels":{"drift":null}}
+labels now: None
