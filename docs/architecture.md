@@ -22,6 +22,10 @@ current slot/WAL status. See [CDC evidence](evidence/step3/cdc-status.json).
 The orders catch-up advanced its cursor to 225405; two rows were already above
 that watermark at its post-run check. Step 4 has deployed external Bronze tables and native monthly-partitioned
 sales tables. Silver and Gold remain planned for Lesson 5.
+Step 8 declares the Bronze bucket and the four `g07_*` datasets, with their
+named grants, in Terraform (`infra/terraform/`), adopted with import blocks
+rather than recreated; state lives in a versioned GCS bucket
+([infra.md](infra.md), [ADR 0008](adr/0008-remote-state.md)).
 
 ## Context and target diagram
 
@@ -53,6 +57,17 @@ flowchart LR
         debezium[Debezium Connect - existing PostgreSQL slot/publication]
         cdc_sink[Python raw CDC Kafka consumer]
     end
+
+    subgraph iac[Step 8 - Terraform: infra/terraform]
+        tf[Terraform 1.17 + google 8.9.0 - 17 resources adopted, plan: No changes]
+        tfstate[(GCS: data-engineering-i1-g07-tfstate - versioned state)]
+        tf <-->|state + lock| tfstate
+    end
+    tf -.->|declares and owns| bronze
+    tf -.->|declares and owns| ext
+    tf -.->|declares and owns| raw
+    tf -.->|declares and owns| silver
+    tf -.->|declares and owns| gold
 
     subgraph gcp[Google Cloud: europe-west1 - Bronze and warehouse deployed]
         bronze[(GCS: data-engineering-i1-marketplace-group)]
@@ -129,6 +144,7 @@ was not read. Silver and Gold remain target contracts.
 | [0003](adr/0003-ingestion-modes.md) | Python and Debezium ingestion | Live evidence recorded |
 | [0004 layout](adr/0004-warehouse-tables.md) | Selected native tables | Accepted |
 | [0004 pricing](adr/0004-warehouse-pricing.md) | On-demand with per-query caps | Accepted |
+| [0008](adr/0008-remote-state.md) | Terraform state in a versioned GCS bucket | Accepted |
 
 ## Bronze paths
 
