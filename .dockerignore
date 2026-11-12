@@ -1,0 +1,35 @@
+# Build context for BOTH job images (ingestion/Dockerfile, transform/Dockerfile).
+# Both are built from the repository root, so this one file protects both:
+#   docker build -f ingestion/Dockerfile -t <image>:<tag> .
+#   docker build -f transform/Dockerfile -t <image>:<tag> .
+#
+# Why it exists: .gitignore keeps secrets out of Git, but Docker does not read
+# it. Without this file a careless `COPY . .` would carry .env, the virtualenv,
+# .git and data/ into an image layer, and a layer cannot be un-leaked once the
+# image is pushed. The point is that it holds for the Dockerfile somebody
+# writes in a hurry, not only for ours.
+
+# 1. Start from nothing, then let in only what the two images are built from.
+*
+!pyproject.toml
+!uv.lock
+!ingestion/
+!transform/
+
+# 2. Never, even inside the folders allowed above. The last matching line wins.
+**/.env
+**/.env.*
+**/.venv
+**/venv
+.git
+**/__pycache__
+**/*.pyc
+**/*.parquet
+**/*credentials*.json
+**/*-key.json
+**/service-account*.json
+**/*.tfstate
+**/*.tfstate.*
+transform/target
+transform/dbt_packages
+transform/logs

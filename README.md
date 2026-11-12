@@ -166,6 +166,83 @@ clustering comparisons and deliberate maximum-bytes cap failure are verified.
 | [Evidence](docs/evidence/step4/) | External and native table metadata, job IDs and query measurements |
 | [Dictionary](docs/data-dictionary.md) and [architecture](docs/architecture.md) | Warehouse schemas and updated status |
 
+### Step 6: Container images
+
+Both jobs now run from images that carry their own interpreter, dependencies and code:
+the Step 3 ingestion jobs and the Step 5 dbt project. Each image is pinned at both
+ends (the base image to a patch version, the dependencies by lock file), runs as a
+non-root user, and contains no credentials.
+
+| Deliverable | Content |
+|---|---|
+| [`ingestion/Dockerfile`](ingestion/Dockerfile) | Step 3 extractors on `python:3.12.12-slim-bookworm`, `uv.lock` installed frozen. Nothing runs by default. |
+| [`transform/Dockerfile`](transform/Dockerfile) | Step 5 dbt project: `dbt-core` 1.12.6 and `dbt-bigquery` 1.12.2 from `uv.lock`, `dbt_utils` 1.4.1 from `package-lock.yml`. `dbt` is the entrypoint. |
+| [`.dockerignore`](.dockerignore) | Allow-list for both builds. `.env`, virtualenvs, `.git` and credential files never enter a build. |
+| [Tag and registry ADR](docs/adr/0006-image-tags.md) | Tag `YYYY-MM-DD-<git sha>`, never `latest`; registry; rollback commands; retention policy (proposed). |
+| [Reproduction](docs/reproduce.md) | Run, delete, pull, run again, and compare the two digests. Not yet run. |
+
+Images are named `group7-ingestion` and `group7-transform` and are hosted on Docker Hub
+under `<dockerhub-user>/`, in public repositories, so pulling needs no login. They hold
+no secret and no data. No image has been pushed yet; when one is, its tag and digest are
+recorded in `docs/reproduce.md`.
+
+#### Install and run the images
+
+You need Docker Desktop running and about 3 GB of free disk. Steps 1 and 2 need
+nothing else. Run everything from the repository root.
+
+1. **Build both images.** The final `.` is the build context, and the root
+   `.dockerignore` applies to it. Use a non-`latest` tag; for a build you mean to keep,
+   use `YYYY-MM-DD-<short sha>`.
+
+   ```
+   docker build -f ingestion/Dockerfile --build-arg GIT_SHA=<short sha> -t group7-ingestion:<tag> .
+   docker build -f transform/Dockerfile --build-arg GIT_SHA=<short sha> -t group7-transform:<tag> .
+   ```
+
+2. **Run the ingestion job against the local source, writing to a local volume.** No
+   Google account is needed. Start the database, and stop the load generator if you
+   want the row count to stay fixed:
+
+   ```
+   docker compose up -d db
+   docker compose stop load-generator
+   docker run --rm --network albert-marketplace_default -e PGHOST=db -e PGDATABASE=marketplace -e PGUSER=postgres -e PGPASSWORD=postgres -e SOURCE_ID=g07-local-check -v g07_state:/state group7-ingestion:<tag> python ingestion/extract_orders.py --once --local-output /state/bronze --state-file /state/orders-local.json
+   ```
+
+   It prints one line such as `{"rows": 224856, "batches": 45, "last_order_id": 224901}`;
+   the numbers are the orders in your database. Run it again and it prints `"rows": 0`,
+   because the cursor in the `g07_state` volume is already at the end. `docker volume rm
+   g07_state` starts it over.
+
+3. **Run dbt.** This needs your own Google credentials (the Application Default
+   Credentials file from Step 2), mounted read-only. In PowerShell:
+
+   ```
+   $adc = "$env:APPDATA\gcloud\application_default_credentials.json"
+   docker run --rm -v "${adc}:/gcp/adc.json:ro" -e GOOGLE_APPLICATION_CREDENTIALS=/gcp/adc.json -e GOOGLE_CLOUD_PROJECT=data-engineering-i1 group7-transform:<tag> parse
+   ```
+
+   On macOS or Linux the file is `$HOME/.config/gcloud/application_default_credentials.json`.
+   Replace `parse` with `source freshness` or `build` to run those. **`build` replaces the
+   silver and gold objects in the shared project.**
+
+To pull a pushed image instead of building it, Docker alone is enough:
+
+```
+docker pull <dockerhub-user>/group7-ingestion:<tag>
+```
+
+Things that look wrong and are not:
+
+- A bare `docker run <image>` only prints help. Neither image has a default that writes
+  anything; the job is always chosen on the command line.
+- The extractor's cursor is a file in `/state`. Without a named volume there, every run
+  starts again from order 0.
+- `docker run ... group7-transform:<tag> debug` ends with one failed check, `git`. The
+  slim image has no `git`, which only git-based dbt packages need; ours come from
+  `package-lock.yml`. The line that matters is `Connection test: OK`.
+
 ## Start it
 
 You need Docker Desktop (or Docker Engine with Compose v2), about 6 GB of free
