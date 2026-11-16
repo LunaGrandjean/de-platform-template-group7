@@ -248,6 +248,22 @@ Things that look wrong and are not:
   slim image has no `git`, which only git-based dbt packages need; ours come from
   `package-lock.yml`. The line that matters is `Connection test: OK`.
 
+### Step 7: The pipeline on a schedule
+
+Airflow runs the pipeline every day without a person: the orders for the day, then the
+external table, then `dbt build`, which stops before the marts when a test fails.
+
+| Deliverable | Content |
+|---|---|
+| [DAG](orchestration/dags/marketplace_daily.py) and [compose file](orchestration/compose.yaml) | `marketplace_daily`, three `DockerOperator` tasks on the Step 6 images; Airflow 3.3.2, lean enough for an 8 GB laptop |
+| [Orchestration](docs/orchestration.md) | Set-up, the idempotency note per task, retries and the alert, the fire drill (alarm, then lock), the back-fill with its prediction |
+| [Runbook](docs/runbooks/failed-run.md) | For the person on call: what to look at, what broke this week, and whether a rerun is safe |
+| [ADR 0007](docs/adr/0007-idempotency.md) | How reruns are made safe, the alternative per task, the one we are least sure about |
+
+The extractor gained an interval mode for this step
+([`ingestion/extract_orders.py`](ingestion/extract_orders.py)): it reads the orders of the
+run's period and writes a new, never-overwritten Bronze load per day.
+
 ## Start it
 
 You need Docker Desktop (or Docker Engine with Compose v2), about 6 GB of free
