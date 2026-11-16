@@ -144,6 +144,55 @@ class ExtractorTests(LocalCase):
                     self.fail("A second writer acquired the same state lock")
 
 
+def dated(number, day):
+    row = order(number)
+    row["order_date"] = day
+    return row
+
+
+def interval_fetcher(rows):
+    return lambda start, end: [row for row in sorted(rows, key=lambda item: item["order_id"])
+                               if start <= row["order_date"] < end]
+
+
+class IntervalExtractorTests(LocalCase):
+    """Step 7 interval mode: the period comes from the run, and Bronze is never overwritten."""
+
+    def test_one_object_per_day_holding_only_that_days_rows(self):
+        rows = [dated(1, date(2026, 9, 15)), dated(2, date(2026, 9, 15)),
+                dated(3, date(2026, 9, 16)), dated(4, date(2026, 9, 17))]
+        result = extractor.extract_interval(interval_fetcher(rows), date(2026, 9, 15), date(2026, 9, 17),
+                                            self.store, "test", "L1")
+        self.assertEqual((result["rows"], result["objects"]), (3, 2))
+        day = self.root / "objects/bronze/scheduled/orders/interval_date=2026-09-15"
+        self.assertEqual([row["order_id"] for row in read_parquet(day)], [1, 2])
+        self.assertFalse((day.parent / "interval_date=2026-09-17").exists())
+
+    def test_rerun_adds_a_newer_load_and_never_overwrites(self):
+        fetch = interval_fetcher([dated(1, date(2026, 9, 15))])
+        extractor.extract_interval(fetch, date(2026, 9, 15), date(2026, 9, 16), self.store, "test", "L1")
+        extractor.extract_interval(fetch, date(2026, 9, 15), date(2026, 9, 16), self.store, "test", "L2")
+        loads = sorted(path.parent.name for path in (self.root / "objects").rglob("*.parquet"))
+        self.assertEqual(loads, ["load_id=L1", "load_id=L2"])
+        with self.assertRaises(FileExistsError):
+            extractor.extract_interval(fetch, date(2026, 9, 15), date(2026, 9, 16), self.store, "test", "L1")
+
+    def test_empty_day_still_records_that_the_run_happened(self):
+        result = extractor.extract_interval(interval_fetcher([]), date(2026, 9, 15), date(2026, 9, 16),
+                                            self.store, "test", "L1")
+        self.assertEqual((result["rows"], result["objects"]), (0, 1))
+        self.assertEqual(read_parquet(self.root / "objects"), [])
+
+    def test_bad_input_is_refused_before_anything_is_written(self):
+        outside = lambda start, end: [dated(1, date(2026, 9, 20))]
+        for fetch, start, end, load_id in ((outside, date(2026, 9, 15), date(2026, 9, 16), "L1"),
+                                           (interval_fetcher([]), date(2026, 9, 16), date(2026, 9, 15), "L1"),
+                                           (interval_fetcher([]), date(2026, 9, 15), date(2026, 9, 16), "../x")):
+            with self.assertRaises(ValueError):
+                extractor.extract_interval(fetch, start, end, self.store, "test", load_id)
+        self.assertEqual(list((self.root / "objects").rglob("*.parquet")), [])
+
+
 class FakeConsumer:
     def __init__(self, fail=False):
         self.commits = []

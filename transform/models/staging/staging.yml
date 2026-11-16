@@ -99,6 +99,14 @@ models:
       - name: order_id
         data_tests: [unique, not_null]
 
+  - name: stg_scheduled_orders
+    description: "Step 7 interval extract of public.orders, newest load per day only. Overlaps stg_orders; never sum both."
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: interval_date
+        data_tests: [not_null]
+
   - name: stg_kafka_clickstream
     description: "One row per clickstream event, deduplicated on event_id (earliest Kafka position). Describes behaviour, not sales."
     columns:

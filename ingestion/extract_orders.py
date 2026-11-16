@@ -1,10 +1,18 @@
-"""Incremental INSERT-only SQL extraction, using psycopg without an ORM.
+"""Extract public.orders from PostgreSQL to Bronze Parquet, using psycopg without an ORM.
 
+Cursor mode (Step 3, the default): incremental INSERT-only extraction by order_id.
 Single writer per state file. Each batch is written before its atomic cursor
 checkpoint. A crash between those actions can duplicate the batch on restart;
 Bronze does not deduplicate it. Updates, deletes, source resets and transactions
 committing later with IDs below the watermark are NOT captured. This is not CDC
 and is not the authoritative sales input. Use the separate connector stream.
+
+Interval mode (Step 7, used by the scheduler): --interval-start/--interval-end, or
+INTERVAL_START/INTERVAL_END, select the orders whose order_date falls in
+[start, end). The period comes from the run, never from the clock. Each day is
+written as one new object, bronze/scheduled/orders/interval_date=D/load_id=L/,
+and nothing is ever overwritten: a rerun adds a newer load, and silver keeps only
+the newest load per day (models/staging/stg_scheduled_orders.sql).
 """
 
 from __future__ import annotations
@@ -13,10 +21,11 @@ import argparse
 import json
 import logging
 import os
+import re
 import time
 import uuid
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
 import psycopg
@@ -24,9 +33,9 @@ import pyarrow as pa
 from psycopg.rows import dict_row
 
 if __package__:
-    from .common import load_environment, make_store, parquet_object, utc_now
+    from .common import load_environment, make_store, parquet_named, parquet_object, utc_now
 else:
-    from common import load_environment, make_store, parquet_object, utc_now
+    from common import load_environment, make_store, parquet_named, parquet_object, utc_now
 
 LOGGER = logging.getLogger(__name__)
 SCHEMA = pa.schema([
@@ -147,9 +156,86 @@ def run_once(store, state_path: Path, source_id: str, batch_size: int, attempts:
                               upper, store, state_path, source_id, batch_size)
 
 
+INTERVAL_PREFIX = "bronze/scheduled/orders"
+LOAD_ID = re.compile(r"[A-Za-z0-9_.-]{1,64}")
+
+
+def fetch_interval(connection, start: date, end: date) -> list[dict]:
+    with connection.cursor() as cursor:
+        cursor.execute("SELECT * FROM public.orders WHERE order_date >= %s AND order_date < %s "
+                       "ORDER BY order_id", (start, end))
+        if [column.name for column in cursor.description] != SCHEMA.names:
+            raise ValueError("Orders schema changed; no columns may be silently dropped")
+        return cursor.fetchall()
+
+
+def extract_interval(fetch, start: date, end: date, store, source_id: str, load_id: str,
+                     prefix: str = INTERVAL_PREFIX) -> dict:
+    """Write one new object per day of [start, end). Never overwrites: load_id makes each run distinct."""
+    if end <= start:
+        raise ValueError("The interval end must be after its start")
+    if not LOAD_ID.fullmatch(load_id):
+        raise ValueError("load_id may only contain letters, digits, '.', '_' and '-'")
+    rows = fetch(start, end)
+    ids = [row["order_id"] for row in rows]
+    if (len(ids) != len(set(ids)) or any(set(row) != set(SCHEMA.names) for row in rows)
+            or any(not start <= row["order_date"] < end for row in rows)):
+        raise ValueError("Unexpected order keys, columns or dates; refusing to write")
+    objects, day = [], start
+    while day < end:
+        day_rows = [row for row in rows if row["order_date"] == day]
+        schema = SCHEMA.with_metadata({b"source_id": source_id.encode("utf-8"),
+                                       b"source_table": b"public.orders",
+                                       b"interval_date": day.isoformat().encode(),
+                                       b"load_id": load_id.encode()})
+        # A day with no orders still gets an (empty) object: it records that the run happened.
+        name = f"{prefix}/interval_date={day.isoformat()}/load_id={load_id}/part-0.parquet"
+        objects.append(parquet_named(store, name, day_rows, schema))
+        day += timedelta(days=1)
+    return {"mode": "interval", "interval_start": start.isoformat(), "interval_end": end.isoformat(),
+            "load_id": load_id, "rows": len(rows), "objects": len(objects)}
+
+
+def run_interval(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
+    if not (args.interval_start and args.interval_end):
+        parser.error("Interval mode needs both --interval-start and --interval-end "
+                     "(or INTERVAL_START and INTERVAL_END)")
+    try:
+        start, end = date.fromisoformat(args.interval_start), date.fromisoformat(args.interval_end)
+    except ValueError:
+        parser.error("Interval dates must be YYYY-MM-DD")
+    if end <= start:
+        parser.error("The interval end must be after its start")
+    for name in ("PGHOST", "PGDATABASE", "PGUSER", "SOURCE_ID"):
+        if not os.environ.get(name):
+            parser.error(f"Missing environment variable: {name}")
+    # The load id only names the run's objects (provenance); it never selects data.
+    load_id = args.load_id or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S%fZ")
+    if not LOAD_ID.fullmatch(load_id):
+        parser.error("--load-id may only contain letters, digits, '.', '_' and '-'")
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
+    try:
+        store = make_store(args.local_output)
+        with connect_with_retry(args.connection_attempts) as connection:
+            result = extract_interval(lambda lo, hi: fetch_interval(connection, lo, hi),
+                                      start, end, store, os.environ["SOURCE_ID"], load_id)
+        print(json.dumps(result), flush=True)
+    except Exception as error:
+        # Driver exception text may contain connection details. Log no secrets.
+        LOGGER.error("Interval extraction stopped (%s); each day's object is written whole, "
+                     "so rerunning the same interval is safe", type(error).__name__)
+        raise SystemExit(1) from None
+
+
 def main() -> None:
     load_environment()
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--interval-start", default=os.environ.get("INTERVAL_START"),
+                        help="Interval mode: first day covered, YYYY-MM-DD (default $INTERVAL_START)")
+    parser.add_argument("--interval-end", default=os.environ.get("INTERVAL_END"),
+                        help="Interval mode: day after the last one covered (default $INTERVAL_END)")
+    parser.add_argument("--load-id", default=os.environ.get("LOAD_ID"),
+                        help="Interval mode: name for this run's objects (default: UTC timestamp)")
     parser.add_argument("--once", action="store_true", help="Drain one bounded ID window, then exit")
     parser.add_argument("--batch-size", type=int, default=5000)
     parser.add_argument("--poll-seconds", type=float, default=60)
@@ -157,6 +243,9 @@ def main() -> None:
     parser.add_argument("--state-file", type=Path, help="Defaults to data/state/orders.json for GCS")
     parser.add_argument("--local-output", type=Path, help="Local test output instead of GCS")
     args = parser.parse_args()
+    if args.interval_start or args.interval_end:
+        run_interval(parser, args)
+        return
     if args.batch_size < 1 or args.poll_seconds <= 0 or not 1 <= args.connection_attempts <= 10:
         parser.error("Batch/poll values must be positive and connection attempts between 1 and 10")
     default_state = Path("data/state/orders.json")
