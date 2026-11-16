@@ -107,7 +107,7 @@ units.
 | Native BigQuery working tables | `g07_warehouse.orders` and `order_lines`, monthly partitions; order_lines clustered by product; snapshot only | See [warehouse tuning](warehouse-tuning.md) for measurements, materialisation and cost cap |
 | Daily-demand materialised view | Verified 2026-11-06: `g07_warehouse.daily_demand`; collapse 1.144487?; independent August result equality; capped uncached jobs | Background refresh disabled for the fixed snapshot; repeat validation after a coordinated rebuild |
 | Silver and Gold | Model design only | Lesson 5: implement and test business transformations |
-| Container images | Step 6: `group7-ingestion` and `group7-transform` built and tested locally (non-root, no secrets, pinned at both ends). The ingestion image ran against the local source and wrote the same rows from two fresh volumes. Not yet pushed or reproduced from the registry. | Push by dated tag, then the reproduction in [reproduce.md](reproduce.md); see [ADR 0006](adr/0006-image-tags.md) |
+| Container images | Step 6: `group7-ingestion` and `group7-transform` built and tested locally (non-root, no secrets, pinned at both ends). The ingestion image ran against the local source and wrote the same rows from two fresh volumes. Pushed to Docker Hub as `omara11/group7-*:2026-11-12-90355ad` and reproduced from there: same output, matching digests. Retention policy executed on 2026-11-16. | Step 7 schedules these images by their dated tag; see [ADR 0006](adr/0006-image-tags.md) and [reproduce.md](reproduce.md) |
 
 ## Bronze, Silver and Gold contracts
 
@@ -131,7 +131,7 @@ was not read. Silver and Gold remain target contracts.
 | [0004 layout](adr/0004-warehouse-tables.md) | Selected native tables | Accepted |
 | [0004 pricing](adr/0004-warehouse-pricing.md) | On-demand with per-query caps | Accepted |
 | [0005](adr/0005-materialisations.md) | Staging and intermediate as views, marts as tables | Accepted |
-| [0006](adr/0006-image-tags.md) | Date-and-commit image tags, public repositories on Docker Hub | Proposed: retention to be executed |
+| [0006](adr/0006-image-tags.md) | Date-and-commit image tags, public repositories on Docker Hub | Accepted: retention executed 2026-11-16 |
 
 ## Bronze paths
 

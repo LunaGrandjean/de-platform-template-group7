@@ -1,6 +1,6 @@
 # ADR 0006: Image tags, registry and retention
 
-- **Status:** proposed. It becomes accepted when the retention policy has been executed and its output is pasted below.
+- **Status:** accepted on 2026-11-16, when the retention policy was executed (evidence below and in step 7 of `docs/reproduce.md`).
 - **Date:** 2026-11-12
 - **Author:** group 7, Step 6 (container images)
 - **Lesson:** L06
@@ -19,8 +19,8 @@ from:
 - **Size, measured locally on 2026-11-12** (uncompressed, `docker images`):
   `group7-ingestion` 605 MB; `group7-transform` 1.44 GB, of which 892 MB is the Python
   environment (the Google client libraries, pyarrow and pandas that `dbt-bigquery`
-  needs) and 200 MiB is compiled bytecode. The compressed size in the registry will be
-  recorded here after the first push.
+  needs) and 200 MiB is compiled bytecode. On Docker Hub the compressed sizes are
+  140.5 MiB and 297.3 MiB (public API, read on 2026-11-12 after the first push).
 - **What is in the images.** Our ingestion code and dbt models, and nothing else of
   ours. No secrets and no data: the `.dockerignore` is an allow-list, a build with nine
   planted decoy secret files let none of them in, and `transform/profiles.yml` holds no
@@ -63,7 +63,7 @@ Where the images live:
   in the tag is the SHA of the code in the image. Nothing is ever tagged `latest`, and
   an existing tag is never pushed again with different content.
 - **Registry:** Docker Hub, in two public repositories,
-  `<dockerhub-user>/group7-ingestion` and `<dockerhub-user>/group7-transform`. It was
+  `omara11/group7-ingestion` and `omara11/group7-transform`. It was
   chosen because it is the option where we can both publish and delete, which the
   retention policy needs, and because a public pull needs no credentials.
 - **Provenance in the image:** the build argument `GIT_SHA` is stored in the label
@@ -79,20 +79,20 @@ with the tag you want back.
 
 1. List the tags that exist (the endpoint is public, so no login is needed). In
    PowerShell:
-   `(Invoke-RestMethod "https://hub.docker.com/v2/repositories/<dockerhub-user>/<image>/tags?page_size=100").results | Select-Object name, last_updated`
+   `(Invoke-RestMethod "https://hub.docker.com/v2/repositories/omara11/<image>/tags?page_size=100").results | Select-Object name, last_updated`
    or, in a POSIX shell:
-   `curl -s "https://hub.docker.com/v2/repositories/<dockerhub-user>/<image>/tags?page_size=100"`
+   `curl -s "https://hub.docker.com/v2/repositories/omara11/<image>/tags?page_size=100"`
 2. Pull the previous build:
-   `docker pull <dockerhub-user>/<image>:<previous-tag>`
+   `docker pull omara11/<image>:<previous-tag>`
 3. Check it is the build you recorded:
-   `docker inspect --format "{{index .RepoDigests 0}}" <dockerhub-user>/<image>:<previous-tag>`,
+   `docker inspect --format "{{index .RepoDigests 0}}" omara11/<image>:<previous-tag>`,
    then compare with the digest in `docs/reproduce.md`.
 4. Point the job at it by changing the tag wherever the job names the image. That is a
    single place per job; it must stay a single place.
 5. Do not rebuild and push a "fixed" image under the old tag. A rollback moves a
    reference to an older tag; it never rewrites one.
 
-## Retention policy (proposed)
+## Retention policy
 
 Per image, three tags survive: the one in use, the one before it (the rollback target),
 and any tag cited as evidence in `docs/reproduce.md`. Every other tag is deleted at the
@@ -100,16 +100,23 @@ next promotion of a new tag, and no uncited tag outlives 30 days.
 
 Enforcement is a deletion in the Docker Hub web UI (repository, **Tags**, select the
 tags, **Delete**). The evidence is the public tag listing from step 1 of the rollback,
-captured before and after the deletion, so the output shows the tag disappear.
+captured before and after the deletion, so the output shows the tag disappear. With only
+one build in existence, the deletion is exercised on a probe tag: a second name for the
+same image (`2026-11-12-probe`), pushed once and then deleted. The build tags
+stay.
 
-**Evidence of enforcement: none yet.** The policy has not been executed. Until a
-deletion has been run and the before-and-after listings are pasted below, this ADR stays
-proposed.
+**Evidence of enforcement.** On 2026-11-16 the probe tag `2026-11-12-probe`, a second name
+for the build `2026-11-12-90355ad` pushed on 2026-11-12, was deleted in the Docker Hub web
+UI. The public tag listing of `omara11/group7-ingestion`, read anonymously before and after
+the deletion:
 
-```text
-<before: paste the tag listing here>
-<after the deletion: paste the tag listing here>
-```
+| Listing | Tags and digest |
+|---|---|
+| Before (2026-11-12) | `2026-11-12-probe` and `2026-11-12-90355ad`, both `sha256:1ac3386beb286b286e593563e12007e1aa7c194ef6b7812d6e6ccd5e0e586f1a` |
+| After (2026-11-16) | `2026-11-12-90355ad` only, `sha256:1ac3386beb286b286e593563e12007e1aa7c194ef6b7812d6e6ccd5e0e586f1a` |
+
+The build tag survived with its digest unchanged, and the dbt repository was not touched.
+The full terminal output is in step 7 of [reproduce.md](../reproduce.md).
 
 ## Consequences
 
@@ -123,7 +130,12 @@ proposed.
 - **Watch:** Docker Hub rate-limits anonymous pulls. A scheduler should pull only when
   the tag it names changes, not on every run. The free plan also limits private
   repositories, so going private later is a decision to check against the account page.
-- **Cost:** none for the registry. Record the compressed size of each push here.
+- **Cost:** none for the registry. The compressed sizes of the first push are in the
+  context above.
+- **Verified on 2026-11-12:** both repositories answer an anonymous API request
+  (`is_private` is false), the digests Docker Hub reports equal the digests of the push,
+  and the ingestion image was pulled with an empty Docker configuration. The transcript
+  is in [reproduce.md](../reproduce.md).
 - **Not chosen, but still there:** the shared Artifact Registry. It holds the other
   groups' images, and we can push to it, so it remains a fallback for pulling from
   inside the project if delete rights are ever granted.

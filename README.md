@@ -178,13 +178,13 @@ non-root user, and contains no credentials.
 | [`ingestion/Dockerfile`](ingestion/Dockerfile) | Step 3 extractors on `python:3.12.12-slim-bookworm`, `uv.lock` installed frozen. Nothing runs by default. |
 | [`transform/Dockerfile`](transform/Dockerfile) | Step 5 dbt project: `dbt-core` 1.12.6 and `dbt-bigquery` 1.12.2 from `uv.lock`, `dbt_utils` 1.4.1 from `package-lock.yml`. `dbt` is the entrypoint. |
 | [`.dockerignore`](.dockerignore) | Allow-list for both builds. `.env`, virtualenvs, `.git` and credential files never enter a build. |
-| [Tag and registry ADR](docs/adr/0006-image-tags.md) | Tag `YYYY-MM-DD-<git sha>`, never `latest`; registry; rollback commands; retention policy (proposed). |
-| [Reproduction](docs/reproduce.md) | Run, delete, pull, run again, and compare the two digests. Not yet run. |
+| [Tag and registry ADR](docs/adr/0006-image-tags.md) | Tag `YYYY-MM-DD-<git sha>`, never `latest`; registry; rollback commands; retention policy, executed on 2026-11-16. |
+| [Reproduction](docs/reproduce.md) | Run, delete, pull, run again, and compare the two digests. Run on 2026-11-12: the digests match. The retention deletion was run on 2026-11-16. |
 
 Images are named `group7-ingestion` and `group7-transform` and are hosted on Docker Hub
-under `<dockerhub-user>/`, in public repositories, so pulling needs no login. They hold
-no secret and no data. No image has been pushed yet; when one is, its tag and digest are
-recorded in `docs/reproduce.md`.
+under `omara11/`, in public repositories, so pulling needs no login. They hold
+no secret and no data. Both were pushed on 2026-11-12 as tag `2026-11-12-90355ad`, the commit they were built
+from; their digests are recorded in `docs/reproduce.md`.
 
 #### Install and run the images
 
@@ -201,17 +201,21 @@ nothing else. Run everything from the repository root.
    ```
 
 2. **Run the ingestion job against the local source, writing to a local volume.** No
-   Google account is needed. Start the database, and stop the load generator if you
-   want the row count to stay fixed:
+   Google account is needed. Start the source database with `migrate`: on a fresh
+   machine it first downloads the released dataset (66 MB) and restores it, which takes
+   about a minute. Starting `db` on its own would give you an empty database, and the job
+   would fail with `UndefinedTable`. `migrate` does not start the load generator, so the
+   row count stays fixed. (If you started everything with `docker compose up`, run
+   `docker compose stop load-generator` first.)
 
    ```
-   docker compose up -d db
-   docker compose stop load-generator
+   docker compose up -d migrate
    docker run --rm --network albert-marketplace_default -e PGHOST=db -e PGDATABASE=marketplace -e PGUSER=postgres -e PGPASSWORD=postgres -e SOURCE_ID=g07-local-check -v g07_state:/state group7-ingestion:<tag> python ingestion/extract_orders.py --once --local-output /state/bronze --state-file /state/orders-local.json
    ```
 
-   It prints one line such as `{"rows": 224856, "batches": 45, "last_order_id": 224901}`;
-   the numbers are the orders in your database. Run it again and it prints `"rows": 0`,
+   On a freshly seeded database it prints
+   `{"rows": 222644, "batches": 45, "last_order_id": 222644}`; if the load generator has
+   run, the numbers are higher. Run it again and it prints `"rows": 0`,
    because the cursor in the `g07_state` volume is already at the end. `docker volume rm
    g07_state` starts it over.
 
@@ -227,10 +231,11 @@ nothing else. Run everything from the repository root.
    Replace `parse` with `source freshness` or `build` to run those. **`build` replaces the
    silver and gold objects in the shared project.**
 
-To pull a pushed image instead of building it, Docker alone is enough:
+To pull a pushed image instead of building it, Docker alone is enough. The tag pushed
+so far is `2026-11-12-90355ad`:
 
 ```
-docker pull <dockerhub-user>/group7-ingestion:<tag>
+docker pull omara11/group7-ingestion:<tag>
 ```
 
 Things that look wrong and are not:
