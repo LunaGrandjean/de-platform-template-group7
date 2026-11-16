@@ -26,7 +26,7 @@ events. The platform targets daily units sold by product and country.
 | Member | GitHub handle | Contribution |
 |---|---|---|
 | Luna Grandjean | [@LunaGrandjean](https://github.com/LunaGrandjean) | Initial platform design and documentation |
-| Omar Abdellatif | [@abdellatifomar61-ship-it](https://github.com/abdellatifomar61-ship-it) | To be documented |
+| Omar Abdellatif | [@abdellatifomar61-ship-it](https://github.com/abdellatifomar61-ship-it) | Step 6 container images (Dockerfiles, Docker Hub tags, reproduction, retention, ADR 0006) and Step 7 Airflow orchestration (DAG, alerts, fire drill, back-fill, runbook, ADR 0007) |
 | Malek Saoudi | [@Msaoudi115](https://github.com/Msaoudi115) | Step 3 live Docker/Debezium deployment and evidence |
 | Anas Mossad | [@realay04](https://github.com/realay04) | To be documented |
 | Emile Gadenne | [@egadenne-ai](https://github.com/egadenne-ai) | Step 4 BigQuery warehouse, costed queries and ADR 0004 |
