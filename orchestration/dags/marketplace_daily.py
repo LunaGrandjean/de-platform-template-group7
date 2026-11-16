@@ -25,8 +25,8 @@ from airflow.timetables.interval import CronDataIntervalTimetable
 from docker.types import Mount
 
 # One place per image: rolling back is changing this tag (ADR 0006). Never "latest".
-INGESTION_IMAGE = os.environ.get("G07_INGESTION_IMAGE") or "omara11/group7-ingestion:2026-11-12-90355ad"
-TRANSFORM_IMAGE = os.environ.get("G07_TRANSFORM_IMAGE") or "omara11/group7-transform:2026-11-12-90355ad"
+INGESTION_IMAGE = os.environ.get("G07_INGESTION_IMAGE") or "omara11/group7-ingestion:2026-11-16-86ef099"
+TRANSFORM_IMAGE = os.environ.get("G07_TRANSFORM_IMAGE") or "omara11/group7-transform:2026-11-16-86ef099"
 
 # "lock": dbt build tests each model as it is built and skips everything downstream of a
 # failure, so bad data stops before the marts. "alarm": dbt run, then dbt test, so the

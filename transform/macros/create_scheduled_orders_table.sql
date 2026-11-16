@@ -4,6 +4,8 @@
   Run by the DAG before dbt: dbt run-operation create_scheduled_orders_table
   CREATE OR REPLACE makes it safe to run on every DAG run; it reads no data.
   Bronze holds every load; stg_scheduled_orders keeps only the newest one per day.
+  No labels option: BigQuery rejects it in CREATE EXTERNAL TABLE ("Unknown option:
+  labels"), found on the first scheduled run.
 #}
 {% macro create_scheduled_orders_table() %}
   {% set bucket = var('bronze_bucket', 'data-engineering-i1-marketplace-group') %}
@@ -15,8 +17,7 @@
       format = 'PARQUET',
       uris = ['{{ prefix }}/*'],
       hive_partition_uri_prefix = '{{ prefix }}',
-      require_hive_partition_filter = true,
-      labels = [('group', 'g07'), ('step', 'l07')]
+      require_hive_partition_filter = true
     )
   {% endset %}
   {% do run_query(sql) %}
