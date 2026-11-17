@@ -14,8 +14,8 @@ extract_orders  ->  create_bronze_table  ->  dbt_build   (the quality gate)
 
 | Task | Runs | Does |
 |---|---|---|
-| `extract_orders` | `omara11/group7-ingestion:2026-11-16-86ef099` | orders whose `order_date` is in the run's period, and their lines, from the source database to `bronze/scheduled/order_items/` and `bronze/scheduled/orders/` |
-| `create_bronze_table` | `omara11/group7-transform:2026-11-16-9ddc0f1` | `dbt run-operation create_scheduled_orders_table`: the two external tables over those paths |
+| `extract_orders` | `omara11/group7-ingestion:2026-11-17-e8df6e5` | orders whose `order_date` is in the run's period, and their lines, from the source database to `bronze/scheduled/order_items/` and `bronze/scheduled/orders/` |
+| `create_bronze_table` | `omara11/group7-transform:2026-11-17-e8df6e5` | `dbt run-operation create_scheduled_orders_table`: the two external tables over those paths |
 | `dbt_build` | the same transform image | `dbt build`: every model, each tested as it is built |
 
 - **Every task is a `DockerOperator`** running a Step 6 image beside Airflow, through the
@@ -328,3 +328,9 @@ snapshot. Fixed as follows (decisions taken by Omar on 2026-11-17):
 | scheduled (2026-09-15 to 24) | 2,212 | 4,144 | 14,019 | 70 |
 
 `fct_daily_demand` sums to 707,339 units, the two rows added together.
+
+Runs 1 to 3 used local builds of commit `71219f3`. The published images,
+`omara11/group7-ingestion:2026-11-17-e8df6e5` and `omara11/group7-transform:2026-11-17-e8df6e5`
+(the same code plus the Step 6 review fix, `uv sync --locked`), are the DAG's defaults. The
+24 Sep run was cleared and rerun on them: all three tasks green, `PASS=102 WARN=1 ERROR=0`.
+A rerun of a day changes nothing in gold, as the idempotency table says.
