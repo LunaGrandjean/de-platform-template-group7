@@ -5,7 +5,8 @@
 #
 # Pinned at both ends:
 #   - the base image to a patch version (python:3.12.12-slim-bookworm),
-#   - dbt-core and dbt-bigquery by transform/uv.lock (--frozen), and
+#   - dbt-core and dbt-bigquery by transform/uv.lock, installed with --locked (the build
+#     fails if the lock no longer matches transform/pyproject.toml), and
 #   - dbt_utils by transform/package-lock.yml (dbt deps installs exactly that).
 FROM python:3.12.12-slim-bookworm
 
@@ -31,7 +32,7 @@ WORKDIR /transform
 # 1. The manifest goes in before the project: model changes rebuild only the layers
 #    below, and the slow dependency install is reused from the cache.
 COPY transform/pyproject.toml transform/uv.lock ./
-RUN uv sync --frozen --no-cache --no-dev --no-install-project \
+RUN uv sync --locked --no-cache --no-dev --no-install-project \
     && useradd --create-home --uid 10001 --shell /usr/sbin/nologin dbt
 
 # 2. The dbt packages, installed at build time from package-lock.yml, so a run needs
