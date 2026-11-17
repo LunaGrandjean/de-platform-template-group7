@@ -5,6 +5,7 @@ import json
 import tempfile
 import unittest
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -150,9 +151,17 @@ def dated(number, day):
     return row
 
 
-def interval_fetcher(rows):
-    return lambda start, end: [row for row in sorted(rows, key=lambda item: item["order_id"])
-                               if start <= row["order_date"] < end]
+def line(number, product, qty=1, price="9.99"):
+    return {"order_id": number, "p_id": product, "qty": qty, "price_at_purchase": Decimal(price)}
+
+
+def interval_fetcher(rows, lines=()):
+    def fetch(start, end):
+        chosen = [row for row in sorted(rows, key=lambda item: item["order_id"])
+                  if start <= row["order_date"] < end]
+        ids = {row["order_id"] for row in chosen}
+        return chosen, [item for item in lines if item["order_id"] in ids]
+    return fetch
 
 
 class IntervalExtractorTests(LocalCase):
@@ -163,29 +172,56 @@ class IntervalExtractorTests(LocalCase):
                 dated(3, date(2026, 9, 16)), dated(4, date(2026, 9, 17))]
         result = extractor.extract_interval(interval_fetcher(rows), date(2026, 9, 15), date(2026, 9, 17),
                                             self.store, "test", "L1")
-        self.assertEqual((result["rows"], result["objects"]), (3, 2))
+        self.assertEqual((result["rows"], result["objects"]), (3, 4))
         day = self.root / "objects/bronze/scheduled/orders/interval_date=2026-09-15"
         self.assertEqual([row["order_id"] for row in read_parquet(day)], [1, 2])
         self.assertFalse((day.parent / "interval_date=2026-09-17").exists())
+
+    def test_lines_land_on_their_orders_day_under_the_same_load(self):
+        rows = [dated(1, date(2026, 9, 15)), dated(2, date(2026, 9, 16))]
+        lines = [line(1, "P1", 2, "3.50"), line(1, "P2"), line(2, "P1")]
+        result = extractor.extract_interval(interval_fetcher(rows, lines), date(2026, 9, 15),
+                                            date(2026, 9, 17), self.store, "test", "L1")
+        self.assertEqual((result["rows"], result["lines"]), (2, 3))
+        folder = self.root / "objects/bronze/scheduled/order_items"
+        first = read_parquet(folder / "interval_date=2026-09-15" / "load_id=L1")
+        self.assertEqual([(item["order_id"], item["p_id"], item["qty"], item["price_at_purchase"])
+                          for item in first], [(1, "P1", 2, Decimal("3.50")), (1, "P2", 1, Decimal("9.99"))])
+        self.assertEqual([item["order_id"] for item in read_parquet(folder / "interval_date=2026-09-16")], [2])
+
+    def test_lines_are_written_before_orders(self):
+        written = []
+        original = self.store.put
+        def record(name, content, kind):
+            written.append(name.split("/")[2])
+            return original(name, content, kind)
+        with patch.object(self.store, "put", side_effect=record):
+            extractor.extract_interval(interval_fetcher([dated(1, date(2026, 9, 15))], [line(1, "P1")]),
+                                       date(2026, 9, 15), date(2026, 9, 16), self.store, "test", "L1")
+        self.assertEqual(written, ["order_items", "orders"])
 
     def test_rerun_adds_a_newer_load_and_never_overwrites(self):
         fetch = interval_fetcher([dated(1, date(2026, 9, 15))])
         extractor.extract_interval(fetch, date(2026, 9, 15), date(2026, 9, 16), self.store, "test", "L1")
         extractor.extract_interval(fetch, date(2026, 9, 15), date(2026, 9, 16), self.store, "test", "L2")
         loads = sorted(path.parent.name for path in (self.root / "objects").rglob("*.parquet"))
-        self.assertEqual(loads, ["load_id=L1", "load_id=L2"])
+        self.assertEqual(loads, ["load_id=L1", "load_id=L1", "load_id=L2", "load_id=L2"])
         with self.assertRaises(FileExistsError):
             extractor.extract_interval(fetch, date(2026, 9, 15), date(2026, 9, 16), self.store, "test", "L1")
 
     def test_empty_day_still_records_that_the_run_happened(self):
         result = extractor.extract_interval(interval_fetcher([]), date(2026, 9, 15), date(2026, 9, 16),
                                             self.store, "test", "L1")
-        self.assertEqual((result["rows"], result["objects"]), (0, 1))
+        self.assertEqual((result["rows"], result["lines"], result["objects"]), (0, 0, 2))
         self.assertEqual(read_parquet(self.root / "objects"), [])
 
     def test_bad_input_is_refused_before_anything_is_written(self):
-        outside = lambda start, end: [dated(1, date(2026, 9, 20))]
+        outside = lambda start, end: ([dated(1, date(2026, 9, 20))], [])
+        orphan = lambda start, end: ([dated(1, date(2026, 9, 15))], [line(2, "P1")])
+        twice = lambda start, end: ([dated(1, date(2026, 9, 15))], [line(1, "P1"), line(1, "P1")])
         for fetch, start, end, load_id in ((outside, date(2026, 9, 15), date(2026, 9, 16), "L1"),
+                                           (orphan, date(2026, 9, 15), date(2026, 9, 16), "L1"),
+                                           (twice, date(2026, 9, 15), date(2026, 9, 16), "L1"),
                                            (interval_fetcher([]), date(2026, 9, 16), date(2026, 9, 15), "L1"),
                                            (interval_fetcher([]), date(2026, 9, 15), date(2026, 9, 16), "../x")):
             with self.assertRaises(ValueError):

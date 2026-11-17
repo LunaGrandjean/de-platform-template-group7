@@ -14,8 +14,8 @@ extract_orders  ->  create_bronze_table  ->  dbt_build   (the quality gate)
 
 | Task | Runs | Does |
 |---|---|---|
-| `extract_orders` | `omara11/group7-ingestion:2026-11-16-86ef099` | orders whose `order_date` is in the run's period, from the source database to `bronze/scheduled/orders/` |
-| `create_bronze_table` | `omara11/group7-transform:2026-11-16-9ddc0f1` | `dbt run-operation create_scheduled_orders_table`: the external table over that path |
+| `extract_orders` | `omara11/group7-ingestion:2026-11-16-86ef099` | orders whose `order_date` is in the run's period, and their lines, from the source database to `bronze/scheduled/order_items/` and `bronze/scheduled/orders/` |
+| `create_bronze_table` | `omara11/group7-transform:2026-11-16-9ddc0f1` | `dbt run-operation create_scheduled_orders_table`: the two external tables over those paths |
 | `dbt_build` | the same transform image | `dbt build`: every model, each tested as it is built |
 
 - **Every task is a `DockerOperator`** running a Step 6 image beside Airflow, through the
@@ -61,8 +61,8 @@ The decision behind this table is [ADR 0007](adr/0007-idempotency.md).
 
 | Task | What it writes | Why running it twice is safe |
 |---|---|---|
-| `extract_orders` | `gs://…/bronze/scheduled/orders/interval_date=D/load_id=L/part-0.parquet` | **A new immutable load per run; the newest load wins at read time.** Nothing is overwritten, and `stg_scheduled_orders` keeps only `max(load_id)` per day. |
-| `create_bronze_table` | definition of `g07_bronze.scheduled_orders` | **`CREATE OR REPLACE EXTERNAL TABLE`**: replaces a definition and reads no data |
+| `extract_orders` | `gs://…/bronze/scheduled/{order_items,orders}/interval_date=D/load_id=L/part-0.parquet`, lines first | **A new immutable load per run; the newest load wins at read time.** Nothing is overwritten. `stg_scheduled_orders` keeps only `max(load_id)` per day, and `stg_scheduled_order_items` only the lines of that load. |
+| `create_bronze_table` | definitions of `g07_bronze.scheduled_orders` and `scheduled_order_items` | **`CREATE OR REPLACE EXTERNAL TABLE`**: replaces a definition and reads no data |
 | `dbt_build` / `dbt_run` | views in `g07_silver`, tables in `g07_gold` | **`CREATE OR REPLACE VIEW` / `CREATE OR REPLACE TABLE`**: BigQuery swaps the new table in atomically |
 | `dbt_test` | nothing | it only reads |
 
@@ -279,3 +279,52 @@ The scheduled run for 2026-11-15 (no orders exist that day) ended `success` and 
 empty file, so Bronze has 0 rows for that day. That is the third drill of lesson 7: a
 period with no data goes green. Nothing in the pipeline says "there was nothing", and the
 section on alerts below explains what would.
+
+## The scheduled orders reach gold (review fix, 2026-11-17)
+
+The first review of this step found the main gap: the scheduled orders reached silver
+(`stg_scheduled_orders`) but nothing read them, so gold still showed only the Step 2
+snapshot. Fixed as follows (decisions taken by Omar on 2026-11-17):
+
+- **The extract also takes the order lines.** A line-grain fact needs products,
+  quantities and prices, which `public.orders` does not hold. Each run now writes the
+  day's `order_items` under the same `load_id`, lines first, so an orders load always has
+  its lines (`ingestion/README.md`).
+- **Gold switches source on one date.** `int_order_lines` takes the deduplicated snapshot
+  before `scheduled_orders_from` (2026-09-15, in `dbt_project.yml`) and the scheduled
+  extract from that day. The snapshot's last order is 2026-09-14 and the two share no
+  `order_id` (checked: 0 overlaps), so no order is counted twice. `fct_order_items` says
+  which with `order_origin`.
+- **No twin rule on the new orders.** The duplicates are a defect of the legacy snapshot.
+  In the local source, 18 payment ids are shared by two orders of the same buyer since 15
+  September, and all 18 have different baskets: real repeat purchases, which the rule would
+  have dropped. `assert_dedup_halves_orders` still checks the snapshot, unchanged.
+- **UNKNOWN country.** 46 of the first 2,208 new orders come from buyers with no address
+  in the snapshot (45 of them have none in the source either). They land in a new
+  `UNKNOWN` member of `dim_country` instead of being dropped or failing the build, as the
+  design sketch planned (acceptance criteria, D2).
+- **A test that a new order reaches gold.** `assert_scheduled_orders_reach_gold` fails the
+  build if any scheduled order in silver is missing from `fct_order_items`, has no lines,
+  or gains or loses a line or a unit on the way. `assert_reconciled_lines_preserved` now
+  counts both origins.
+
+### Evidence
+
+1. **Re-extract of 15-23 Sep** with the new ingestion image, so every day's newest load has
+   its lines: 2,208 orders and 4,140 lines, 18 objects, load `20261117T162655908663Z`.
+   `dbt build`: `PASS=102 WARN=1 ERROR=0` (the warning is the 6 unnamed products).
+2. **Gold equals silver on every day, 15-23 Sep** (orders per day: 264, 242, 244, 243,
+   224, 235, 257, 256, 243). The snapshot part did not move: 111,322 orders, 204,280
+   lines, 693,320 units.
+3. **A day gold had never seen, through the DAG.** Before the run, gold had no order on
+   2026-09-24. The back-fill run for that day (`backfill__2026-09-25T00:00:00+00:00`) went
+   green in under 3 minutes: `extract_orders`, `create_bronze_table`, `dbt_build`. Gold then
+   held exactly the 4 source orders of that day (224898 to 224901), with the same products
+   and quantities as the source, and `fct_daily_demand` ran to 2026-09-24.
+
+| `fct_order_items` | Orders | Lines | Units | UNKNOWN-country lines |
+|---|---|---|---|---|
+| snapshot (to 2026-09-14) | 111,322 | 204,280 | 693,320 | 0 |
+| scheduled (2026-09-15 to 24) | 2,212 | 4,144 | 14,019 | 70 |
+
+`fct_daily_demand` sums to 707,339 units, the two rows added together.

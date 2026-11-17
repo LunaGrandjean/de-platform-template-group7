@@ -9,10 +9,14 @@ and is not the authoritative sales input. Use the separate connector stream.
 
 Interval mode (Step 7, used by the scheduler): --interval-start/--interval-end, or
 INTERVAL_START/INTERVAL_END, select the orders whose order_date falls in
-[start, end). The period comes from the run, never from the clock. Each day is
-written as one new object, bronze/scheduled/orders/interval_date=D/load_id=L/,
-and nothing is ever overwritten: a rerun adds a newer load, and silver keeps only
-the newest load per day (models/staging/stg_scheduled_orders.sql).
+[start, end), and their order lines. The period comes from the run, never from the
+clock. Each day is written as two new objects under the same load id,
+bronze/scheduled/order_items/interval_date=D/load_id=L/ first, then
+bronze/scheduled/orders/interval_date=D/load_id=L/, and nothing is ever
+overwritten: a rerun adds a newer load, and silver keeps only the newest orders
+load per day and the lines of that same load (models/staging/stg_scheduled_*.sql).
+Lines go first, so an orders load that exists always has its lines; a crash in
+between leaves only a lines load that silver ignores.
 """
 
 from __future__ import annotations
@@ -157,43 +161,69 @@ def run_once(store, state_path: Path, source_id: str, batch_size: int, attempts:
 
 
 INTERVAL_PREFIX = "bronze/scheduled/orders"
+LINES_PREFIX = "bronze/scheduled/order_items"
 LOAD_ID = re.compile(r"[A-Za-z0-9_.-]{1,64}")
+LINES_SCHEMA = pa.schema([
+    ("order_id", pa.int64()), ("p_id", pa.string()), ("qty", pa.int64()),
+    ("price_at_purchase", pa.decimal128(10, 2)),
+])
 
 
-def fetch_interval(connection, start: date, end: date) -> list[dict]:
-    with connection.cursor() as cursor:
+def fetch_interval(connection, start: date, end: date) -> tuple[list[dict], list[dict]]:
+    """Orders of [start, end) and their lines, read from one snapshot of the database."""
+    with connection.transaction(), connection.cursor() as cursor:
+        # Both reads see the same committed state, so no line can belong to an order
+        # that the first read missed.
+        cursor.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
         cursor.execute("SELECT * FROM public.orders WHERE order_date >= %s AND order_date < %s "
                        "ORDER BY order_id", (start, end))
         if [column.name for column in cursor.description] != SCHEMA.names:
             raise ValueError("Orders schema changed; no columns may be silently dropped")
-        return cursor.fetchall()
+        orders = cursor.fetchall()
+        cursor.execute("SELECT oi.* FROM public.order_items AS oi JOIN public.orders AS o "
+                       "USING (order_id) WHERE o.order_date >= %s AND o.order_date < %s "
+                       "ORDER BY oi.order_id, oi.p_id", (start, end))
+        if [column.name for column in cursor.description] != LINES_SCHEMA.names:
+            raise ValueError("Order lines schema changed; no columns may be silently dropped")
+        return orders, cursor.fetchall()
 
 
 def extract_interval(fetch, start: date, end: date, store, source_id: str, load_id: str,
-                     prefix: str = INTERVAL_PREFIX) -> dict:
-    """Write one new object per day of [start, end). Never overwrites: load_id makes each run distinct."""
+                     prefix: str = INTERVAL_PREFIX, lines_prefix: str = LINES_PREFIX) -> dict:
+    """Write two new objects per day of [start, end), lines then orders. Never overwrites:
+    load_id makes each run distinct."""
     if end <= start:
         raise ValueError("The interval end must be after its start")
     if not LOAD_ID.fullmatch(load_id):
         raise ValueError("load_id may only contain letters, digits, '.', '_' and '-'")
-    rows = fetch(start, end)
+    rows, lines = fetch(start, end)
     ids = [row["order_id"] for row in rows]
     if (len(ids) != len(set(ids)) or any(set(row) != set(SCHEMA.names) for row in rows)
             or any(not start <= row["order_date"] < end for row in rows)):
         raise ValueError("Unexpected order keys, columns or dates; refusing to write")
+    day_of = {row["order_id"]: row["order_date"] for row in rows}
+    keys = [(line["order_id"], line["p_id"]) for line in lines]
+    if (len(keys) != len(set(keys)) or any(set(line) != set(LINES_SCHEMA.names) for line in lines)
+            or any(line["order_id"] not in day_of for line in lines)):
+        raise ValueError("Unexpected order line keys or columns, or a line without its order; "
+                         "refusing to write")
     objects, day = [], start
     while day < end:
-        day_rows = [row for row in rows if row["order_date"] == day]
-        schema = SCHEMA.with_metadata({b"source_id": source_id.encode("utf-8"),
-                                       b"source_table": b"public.orders",
-                                       b"interval_date": day.isoformat().encode(),
-                                       b"load_id": load_id.encode()})
-        # A day with no orders still gets an (empty) object: it records that the run happened.
-        name = f"{prefix}/interval_date={day.isoformat()}/load_id={load_id}/part-0.parquet"
-        objects.append(parquet_named(store, name, day_rows, schema))
+        # A day with no orders still gets (empty) objects: they record that the run happened.
+        # Lines first: an orders object that exists always has its lines object.
+        for table, folder, schema, day_rows in (
+                ("public.order_items", lines_prefix, LINES_SCHEMA,
+                 [line for line in lines if day_of[line["order_id"]] == day]),
+                ("public.orders", prefix, SCHEMA, [row for row in rows if row["order_date"] == day])):
+            tagged = schema.with_metadata({b"source_id": source_id.encode("utf-8"),
+                                           b"source_table": table.encode(),
+                                           b"interval_date": day.isoformat().encode(),
+                                           b"load_id": load_id.encode()})
+            name = f"{folder}/interval_date={day.isoformat()}/load_id={load_id}/part-0.parquet"
+            objects.append(parquet_named(store, name, day_rows, tagged))
         day += timedelta(days=1)
     return {"mode": "interval", "interval_start": start.isoformat(), "interval_end": end.isoformat(),
-            "load_id": load_id, "rows": len(rows), "objects": len(objects)}
+            "load_id": load_id, "rows": len(rows), "lines": len(lines), "objects": len(objects)}
 
 
 def run_interval(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:

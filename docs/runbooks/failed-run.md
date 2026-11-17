@@ -85,7 +85,7 @@ docker compose -f orchestration/compose.yaml exec airflow-scheduler airflow dags
 
 | Task | Why a rerun is safe |
 |---|---|
-| `extract_orders` | It writes a new Bronze load and never overwrites; silver keeps the newest load per day. A rerun adds a copy in Bronze and changes nothing in silver. |
+| `extract_orders` | It writes a new Bronze load and never overwrites; silver keeps the newest load per day. A rerun adds a copy in Bronze and changes nothing in silver, as long as the source has not changed for that day. **Caveat (ADR 0007, limit 3):** if a day that once had orders is re-extracted with none (orders deleted in the source), its newest load is empty, and silver keeps showing the older rows. Check the day in the source before trusting such a rerun. |
 | `create_bronze_table` | `CREATE OR REPLACE` of a table definition. |
 | dbt | `CREATE OR REPLACE` of views and tables; tests only read. |
 

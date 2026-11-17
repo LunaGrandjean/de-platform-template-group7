@@ -23,8 +23,8 @@ Three tasks write something. `dbt test`, when it runs separately, only reads.
 
 | Task | Writes |
 |---|---|
-| `extract_orders` | Parquet in `gs://…/bronze/scheduled/orders/` |
-| `create_bronze_table` | the definition of `g07_bronze.scheduled_orders` |
+| `extract_orders` | Parquet in `gs://…/bronze/scheduled/order_items/` and `…/orders/` |
+| `create_bronze_table` | the definitions of `g07_bronze.scheduled_orders` and `scheduled_order_items` |
 | `dbt_build` (or `dbt_run`) | views in `g07_silver`, tables in `g07_gold` |
 
 Two constraints narrow the options:
@@ -47,7 +47,7 @@ Two constraints narrow the options:
 
 | Task | Mechanism | Why running it twice is safe | Chosen over |
 |---|---|---|---|
-| `extract_orders` | **New immutable version, newest wins at read time.** Each run writes a new object per day, `interval_date=D/load_id=L/part-0.parquet`, with a fresh `load_id` (a UTC timestamp). Nothing is overwritten. `stg_scheduled_orders` keeps only `max(load_id)` per `interval_date`. | A rerun adds a newer copy of the same day; silver shows exactly one. A failed run leaves the previous load in place, because each day's object is written whole or not at all. | Delete-then-insert by partition: it would break the Bronze promise, and a failure between the delete and the insert loses the day. |
+| `extract_orders` | **New immutable version, newest wins at read time.** Each run writes two new objects per day, lines then orders, `interval_date=D/load_id=L/part-0.parquet`, with a fresh `load_id` (a UTC timestamp). Nothing is overwritten. `stg_scheduled_orders` keeps only `max(load_id)` per `interval_date`, and `stg_scheduled_order_items` only the lines of that load. | A rerun adds a newer copy of the same day; silver shows exactly one. A failed run leaves the previous load in place, because each day's object is written whole or not at all. | Delete-then-insert by partition: it would break the Bronze promise, and a failure between the delete and the insert loses the day. |
 | `create_bronze_table` | `CREATE OR REPLACE EXTERNAL TABLE` | It replaces a definition and reads no data; the result is the same however often it runs. | Creating it once by hand: then a fresh project would need an undocumented step. |
 | dbt views (staging, intermediate) | `CREATE OR REPLACE VIEW` | A view stores no rows; replacing it twice gives the same view. | |
 | dbt tables (marts) | `CREATE OR REPLACE TABLE` (dbt `table` materialisation) | BigQuery builds the new table and swaps it in atomically; readers see the old table or the new one, never a half-written one. | Incremental marts: ADR 0005 explains why the duplicate-order rule cannot be applied to new days only. |

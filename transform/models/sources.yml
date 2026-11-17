@@ -87,6 +87,13 @@ sources:
           the macro create_scheduled_orders_table, which the DAG runs before dbt.
           No freshness rule yet: the daily run proves arrival, and its failure alert is
           what tells a person the data stopped.
+      - name: scheduled_order_items
+        description: >
+          Step 7 interval extract of public.order_items: the lines of the orders in
+          scheduled_orders, written by the same run under the same load_id and day
+          (the order's date), bronze/scheduled/order_items/interval_date=D/load_id=L/.
+          Lines are written before orders, so every orders load has its lines. Same
+          macro, same freshness reasoning as scheduled_orders.
       - name: kafka_clickstream
         description: >
           Validated clickstream events from topic clickstream
