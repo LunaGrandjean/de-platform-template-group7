@@ -6,7 +6,8 @@
 # Pinned at both ends:
 #   - the base image to a patch version (python:3.12.12-slim-bookworm), and
 #   - every Python dependency by uv.lock (exact versions plus hashes), installed
-#     with --frozen so a stale lock fails the build instead of being re-resolved.
+#     with --locked, which fails the build if uv.lock no longer matches pyproject.toml
+#     (--frozen would skip that check and install a stale lock without a word).
 FROM python:3.12.12-slim-bookworm
 
 # uv, pinned, copied from its official image: nothing else from that image comes along.
@@ -25,7 +26,7 @@ WORKDIR /app
 # 1. The manifest goes in before the code: a code change rebuilds only the layers
 #    below, and the slow dependency install is reused from the cache.
 COPY pyproject.toml uv.lock ./
-RUN uv sync --frozen --no-cache --no-dev --no-install-project \
+RUN uv sync --locked --no-cache --no-dev --no-install-project \
     && useradd --create-home --uid 10001 --shell /usr/sbin/nologin ingest \
     && mkdir /state \
     && chown ingest /state

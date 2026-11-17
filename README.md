@@ -175,7 +175,7 @@ non-root user, and contains no credentials.
 
 | Deliverable | Content |
 |---|---|
-| [`ingestion/Dockerfile`](ingestion/Dockerfile) | Step 3 extractors on `python:3.12.12-slim-bookworm`, `uv.lock` installed frozen. Nothing runs by default. |
+| [`ingestion/Dockerfile`](ingestion/Dockerfile) | Step 3 extractors on `python:3.12.12-slim-bookworm`, `uv.lock` installed with `--locked`. Nothing runs by default. |
 | [`transform/Dockerfile`](transform/Dockerfile) | Step 5 dbt project: `dbt-core` 1.12.6 and `dbt-bigquery` 1.12.2 from `uv.lock`, `dbt_utils` 1.4.1 from `package-lock.yml`. `dbt` is the entrypoint. |
 | [`.dockerignore`](.dockerignore) | Allow-list for both builds. `.env`, virtualenvs, `.git` and credential files never enter a build. |
 | [Tag and registry ADR](docs/adr/0006-image-tags.md) | Tag `YYYY-MM-DD-<git sha>`, never `latest`; registry; rollback commands; retention policy, executed on 2026-11-16. |
@@ -196,8 +196,8 @@ nothing else. Run everything from the repository root.
    use `YYYY-MM-DD-<short sha>`.
 
    ```
-   docker build -f ingestion/Dockerfile --build-arg GIT_SHA=<short sha> -t group7-ingestion:<tag> .
-   docker build -f transform/Dockerfile --build-arg GIT_SHA=<short sha> -t group7-transform:<tag> .
+   docker build -f ingestion/Dockerfile --build-arg GIT_SHA=<short sha> -t omara11/group7-ingestion:<tag> .
+   docker build -f transform/Dockerfile --build-arg GIT_SHA=<short sha> -t omara11/group7-transform:<tag> .
    ```
 
 2. **Run the ingestion job against the local source, writing to a local volume.** No
@@ -210,7 +210,7 @@ nothing else. Run everything from the repository root.
 
    ```
    docker compose up -d migrate
-   docker run --rm --network albert-marketplace_default -e PGHOST=db -e PGDATABASE=marketplace -e PGUSER=postgres -e PGPASSWORD=postgres -e SOURCE_ID=g07-local-check -v g07_state:/state group7-ingestion:<tag> python ingestion/extract_orders.py --once --local-output /state/bronze --state-file /state/orders-local.json
+   docker run --rm --network albert-marketplace_default -e PGHOST=db -e PGDATABASE=marketplace -e PGUSER=postgres -e PGPASSWORD=postgres -e SOURCE_ID=g07-local-check -v g07_state:/state omara11/group7-ingestion:<tag> python ingestion/extract_orders.py --once --local-output /state/bronze --state-file /state/orders-local.json
    ```
 
    On a freshly seeded database it prints
@@ -224,7 +224,7 @@ nothing else. Run everything from the repository root.
 
    ```
    $adc = "$env:APPDATA\gcloud\application_default_credentials.json"
-   docker run --rm -v "${adc}:/gcp/adc.json:ro" -e GOOGLE_APPLICATION_CREDENTIALS=/gcp/adc.json -e GOOGLE_CLOUD_PROJECT=data-engineering-i1 group7-transform:<tag> parse
+   docker run --rm -v "${adc}:/gcp/adc.json:ro" -e GOOGLE_APPLICATION_CREDENTIALS=/gcp/adc.json -e GOOGLE_CLOUD_PROJECT=data-engineering-i1 omara11/group7-transform:<tag> parse
    ```
 
    On macOS or Linux the file is `$HOME/.config/gcloud/application_default_credentials.json`.
@@ -236,6 +236,7 @@ so far is `2026-11-12-90355ad`:
 
 ```
 docker pull omara11/group7-ingestion:<tag>
+docker pull omara11/group7-transform:<tag>
 ```
 
 Things that look wrong and are not:
@@ -244,7 +245,7 @@ Things that look wrong and are not:
   anything; the job is always chosen on the command line.
 - The extractor's cursor is a file in `/state`. Without a named volume there, every run
   starts again from order 0.
-- `docker run ... group7-transform:<tag> debug` ends with one failed check, `git`. The
+- `docker run ... omara11/group7-transform:<tag> debug` ends with one failed check, `git`. The
   slim image has no `git`, which only git-based dbt packages need; ours come from
   `package-lock.yml`. The line that matters is `Connection test: OK`.
 
