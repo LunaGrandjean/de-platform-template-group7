@@ -69,11 +69,21 @@ def make_store(local_output: Path | None = None):
     return GCSStore(os.environ["GCP_PROJECT_ID"], os.environ["BRONZE_BUCKET"])
 
 
-def parquet_object(store, prefix: str, rows: list[dict], schema: pa.Schema) -> str:
+def parquet_bytes(rows: list[dict], schema: pa.Schema) -> bytes:
     buffer = pa.BufferOutputStream()
     pq.write_table(pa.Table.from_pylist(rows, schema=schema), buffer, compression="snappy")
+    return buffer.getvalue().to_pybytes()
+
+
+def parquet_object(store, prefix: str, rows: list[dict], schema: pa.Schema) -> str:
     name = f"{prefix}/{uuid.uuid4().hex}.parquet"
-    store.put(name, buffer.getvalue().to_pybytes(), "application/octet-stream")
+    store.put(name, parquet_bytes(rows, schema), "application/octet-stream")
+    return name
+
+
+def parquet_named(store, name: str, rows: list[dict], schema: pa.Schema) -> str:
+    """Write one Parquet object under an exact name. Both stores refuse to overwrite."""
+    store.put(safe_name(name), parquet_bytes(rows, schema), "application/octet-stream")
     return name
 
 

@@ -30,7 +30,7 @@ authenticated: the author pastes the plan output in the PR description, and
 | Address | Real resource | Why it exists |
 |---|---|---|
 | `google_storage_bucket.bronze` | `gs://data-engineering-i1-marketplace-group` | The Bronze lake: the only copy of what arrived from PostgreSQL, Debezium and Kafka (Steps 2-3). `prevent_destroy`; its lifecycle cools objects to Nearline/Coldline/Archive and never deletes. |
-| `google_bigquery_dataset.bronze` | `g07_bronze` | External tables over the Bronze Parquet, so SQL and dbt read the lake without loading it (Step 4). |
+| `google_bigquery_dataset.bronze` | `g07_bronze` | External tables over the Bronze Parquet, so SQL and dbt read the lake without loading it (Step 4). Since Step 7 it also holds `scheduled_orders` and `scheduled_order_items`, recreated by the DAG on every run. |
 | `google_bigquery_dataset.warehouse` | `g07_warehouse` | Native month-partitioned orders and order lines plus the daily-demand MV, for queries filtered often (Step 4, ADR 0004). |
 | `google_bigquery_dataset.silver` | `g07_silver` | dbt staging and intermediate views: typed, deduplicated records (Step 5, ADR 0005). |
 | `google_bigquery_dataset.gold` | `g07_gold` | dbt marts: the daily-demand star read by the ML team and reports (Step 5). |
@@ -40,7 +40,7 @@ authenticated: the author pastes the plan output in the PR description, and
 | `google_bigquery_dataset_iam_member.warehouse_writers[*]` (4) | Anas, Luna, Malek, Omar, `dataEditor` on `g07_warehouse` | Every member ran Step 4 loads and tuning experiments. |
 | `google_bigquery_dataset_iam_member.silver_owner` | Malek, `dataOwner` on `g07_silver` | First `dbt build` created the dataset under his identity. |
 | `google_bigquery_dataset_iam_member.gold_owner` | Malek, `dataOwner` on `g07_gold` | Same. |
-| `google_service_account.pipeline` + 3 bindings | `g07-pipeline@…` (**not created**, `count = 0`) | The identity Airflow (Step 7) should run the images as, instead of a person. Our accounts lack `iam.serviceAccounts.create` in the shared project (`testIamPermissions`, 2026-11-08). Created once the course admin grants it: set `create_service_account = true`. |
+| `google_service_account.pipeline` + 5 bindings | `g07-pipeline@…` (**not created**, `count = 0`) | The identity Airflow (Step 7) should run the images as, instead of a person. Our accounts lack `iam.serviceAccounts.create` in the shared project (`testIamPermissions`, 2026-11-08). Created once the course admin grants it: set `create_service_account = true`. Grants: `objectUser` on the bucket, `dataEditor` on the four datasets (see below). |
 
 **Outside Terraform, on purpose:**
 
@@ -49,6 +49,40 @@ authenticated: the author pastes the plan output in the PR description, and
 | `gs://data-engineering-i1-g07-tfstate` | Holds the state itself; created by hand on 2026-11-08 (versioning on, public access prevention enforced, uniform access). A configuration cannot safely manage the bucket its own state lives in. |
 | Project default bindings (`projectOwners/Writers/Readers` on the datasets, `projectEditor/Viewer` on the bucket) | Inherited from the shared project, owned by the course admin. Declaring them in our state would let our `apply` change other groups' access. They are broader than our matrix needs: gap kept for Step 10. |
 | The project, APIs, billing | Owned by the course admin. |
+| Tables and views inside the datasets | Created by the code that fills them: Step 4 SQL in `g07_warehouse`, dbt in `g07_silver` and `g07_gold`, and the Step 7 macro [`create_scheduled_orders_table`](../transform/macros/create_scheduled_orders_table.sql) in `g07_bronze`. Terraform owns the containers and who can reach them; declaring the tables too would make two tools fight over the same definitions on every run. |
+| Bronze objects, including `bronze/scheduled/` (Step 7) | Data, not infrastructure. They are covered by the bucket's lifecycle rules (prefix `bronze/`), which are in Terraform. |
+| Docker Hub repositories `omara11/group7-ingestion` and `omara11/group7-transform` | The Step 6 registry ([ADR 0006](adr/0006-image-tags.md)): outside GCP, under a personal Docker Hub account, with no Terraform provider in this configuration. The retention policy is run by hand (ADR 0006). |
+| Shared Artifact Registry `dataeng` | Belongs to the course; we cannot delete from it, which is why ADR 0006 did not use it. |
+
+## The pipeline's identity (Steps 7 and 8)
+
+Airflow runs the three DAG tasks with the **operator's own Google credentials**,
+copied into the Docker volume `g07_gcloud` ([orchestration.md](orchestration.md)).
+For every member except the owners, Terraform grants only `dataViewer` on
+`g07_bronze` and nothing on `g07_silver` or `g07_gold`, and nothing on the
+bucket for anyone. Yet the runs of 2026-11-16 and 17 succeeded: the writes
+went through the shared project's **default bindings** (`projectWriters` on
+the datasets, `projectEditor` on the bucket), not through anything declared
+here. This is inferred from the grants, not re-checked live: the project's
+billing account was disabled on 2026-11-18, and `terraform plan` returned 403.
+The pipeline therefore depends today on the very bindings we plan to narrow in
+Step 10, and narrowing them first would break it.
+
+The service account fixes the order of operations. What each task needs, and
+the binding in [`service_account.tf`](../infra/terraform/service_account.tf)
+that gives it:
+
+| Task | Does | Binding |
+|---|---|---|
+| `extract_orders` | writes `bronze/scheduled/{orders,order_items}/…` | `roles/storage.objectUser` on the bucket |
+| `create_bronze_table` | `CREATE OR REPLACE EXTERNAL TABLE` on `g07_bronze.scheduled_orders` and `scheduled_order_items` | `roles/bigquery.dataEditor` on `g07_bronze` |
+| `dbt_build` | reads `g07_bronze` and `g07_warehouse`, writes views in `g07_silver` and tables in `g07_gold` | `roles/bigquery.dataEditor` on `g07_silver` and `g07_gold` (and on `g07_warehouse`, for the Step 4 loads once scheduled) |
+| every task that queries | runs BigQuery jobs | `roles/bigquery.jobUser` at **project level**: not in Terraform, asked of the course admin with the account |
+
+Switch-over, once the admin creates the account (or grants the permission):
+`apply` with `create_service_account = true`, replace the credentials in
+`g07_gcloud` with the account's impersonated credentials (never a key), rerun
+one day of the DAG, and only then remove the personal write paths in Step 10.
 
 ## Adoption: import, not recreate
 
@@ -103,9 +137,13 @@ Until then nobody runs `apply`, because it would silently revert the fix.
 
 ## Not covered yet
 
-- The service account exists only in code (see above).
+- The service account exists only in code (see above), so the scheduled
+  pipeline still runs as a person through the project default bindings.
+- `bigquery.jobUser` for the service account is project-level and stays with
+  the course admin.
 - `plan` does not run in CI: that needs a GCP identity for GitHub (Workload
   Identity Federation), which needs the same admin permission as the service
   account.
 - Labels on Silver and Gold, and a budget alert: Step 9.
-- Removing the broad project default bindings: Step 10.
+- Removing the broad project default bindings: Step 10, and only after the
+  pipeline runs as the service account (see "The pipeline's identity").

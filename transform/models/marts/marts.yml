@@ -25,7 +25,7 @@ models:
         data_tests: [not_null]
 
   - name: dim_country
-    description: "One row per market (six). GRAIN: (country_code)."
+    description: "One row per market (six) plus UNKNOWN, for buyers with no known address. GRAIN: (country_code)."
     columns:
       - name: country_code
         data_tests: [unique, not_null]
@@ -40,9 +40,11 @@ models:
 
   - name: fct_order_items
     description: >
-      One row per order line of a real order, after the legacy duplicate orders
-      are removed (111,322 orders). GRAIN: (order_id, p_id). The country is the
-      one of the buyer's default address. Lines priced 0.00 are kept and flagged.
+      One row per order line of a real order: the Step 2 snapshot after the legacy
+      duplicate orders are removed (111,322 orders, to 2026-09-14), then the Step 7
+      scheduled extract from 2026-09-15 (order_origin says which). GRAIN:
+      (order_id, p_id). The country is the one of the buyer's default address, or
+      UNKNOWN when the buyer has none. Lines priced 0.00 are kept and flagged.
       gross_amount_eur is quantity times price at purchase, before discounts and
       without returns.
     data_tests:
@@ -85,6 +87,12 @@ models:
               arguments:
                 min_value: 0
                 inclusive: true
+      - name: order_origin
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ["snapshot", "scheduled"]
 
   - name: fct_daily_demand
     description: >

@@ -1,17 +1,31 @@
 -- Acceptance check: the country join must not add, drop or repeat order lines,
 -- and quantities must still add up to the reconciled silver lines.
 --
--- "Reconciled silver lines" = the order lines of the orders that survived
--- deduplication, taken straight from silver with no country, product or date
--- join. fct_order_items and fct_daily_demand must match it exactly.
+-- "Reconciled silver lines" = the snapshot lines of the orders that survived
+-- deduplication (before the cut-over), plus the scheduled lines (from the
+-- cut-over), taken straight from silver with no country or product join.
+-- fct_order_items and fct_daily_demand must match it exactly.
 -- Fails (returns a row) when any of the three disagree.
-with reconciled as (
+with silver_lines as (
 
-    select
-        count(*)             as line_count,
-        sum(items.quantity)  as units
+    select items.quantity
     from {{ ref('stg_order_items') }} as items
     inner join {{ ref('int_orders_deduplicated') }} as orders using (order_id)
+    where orders.order_date < date '{{ var("scheduled_orders_from") }}'
+
+    union all
+
+    select items.quantity
+    from {{ ref('stg_scheduled_order_items') }} as items
+    inner join {{ ref('stg_scheduled_orders') }} as orders using (order_id)
+    where orders.order_date >= date '{{ var("scheduled_orders_from") }}'
+
+),
+
+reconciled as (
+
+    select count(*) as line_count, sum(quantity) as units
+    from silver_lines
 
 ),
 

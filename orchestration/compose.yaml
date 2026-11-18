@@ -1,0 +1,138 @@
+# Airflow for group 7 (Step 7), lean enough for an 8 GB laptop.
+#
+# Based on the official Airflow 3.3.2 docker-compose.yaml, with these changes:
+#   - LocalExecutor instead of Celery: no Redis, no worker, no triggerer. Tasks run in
+#     the scheduler container, one or two at a time.
+#   - One API worker and one parsing process, to keep memory down.
+#   - Only dags/ and logs/ are mounted. dags/ is orchestration/dags in the repository.
+#   - The host's Docker socket is mounted, because every task is a DockerOperator that
+#     starts one of our Step 6 images beside Airflow, not inside it.
+#   - postgres:17.11, the same pinned image the source system already uses.
+#
+# Start:   docker compose -f orchestration/compose.yaml up -d
+# UI:      http://localhost:8080   (user airflow, password airflow: local only)
+# Stop:    docker compose -f orchestration/compose.yaml down
+#
+# Settings that differ per machine (image tags, alert webhook) go in orchestration/.env,
+# which Git ignores. See docs/orchestration.md.
+name: g07-airflow
+
+x-airflow-common:
+  &airflow-common
+  image: apache/airflow:3.3.2
+  environment:
+    &airflow-common-env
+    AIRFLOW__CORE__EXECUTOR: LocalExecutor
+    AIRFLOW__CORE__PARALLELISM: "2"
+    AIRFLOW__CORE__AUTH_MANAGER: airflow.providers.fab.auth_manager.fab_auth_manager.FabAuthManager
+    AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://airflow:airflow@postgres/airflow
+    AIRFLOW__CORE__FERNET_KEY: ${FERNET_KEY:-}
+    # New DAGs start paused: unpausing marketplace_daily once is the only manual step.
+    AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "true"
+    AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    AIRFLOW__CORE__EXECUTION_API_SERVER_URL: http://airflow-apiserver:8080/execution/
+    AIRFLOW__API_AUTH__JWT_SECRET: ${AIRFLOW__API_AUTH__JWT_SECRET:-airflow_jwt_secret}
+    AIRFLOW__API_AUTH__JWT_ISSUER: airflow
+    AIRFLOW__API__WORKERS: "1"
+    AIRFLOW__DAG_PROCESSOR__PARSING_PROCESSES: "1"
+    AIRFLOW__SCHEDULER__ENABLE_HEALTH_CHECK: "true"
+    # Read by the DAG file (orchestration/dags/marketplace_daily.py). Empty means "use the
+    # default written in the DAG".
+    G07_INGESTION_IMAGE: ${G07_INGESTION_IMAGE:-}
+    G07_TRANSFORM_IMAGE: ${G07_TRANSFORM_IMAGE:-}
+    G07_GATE: ${G07_GATE:-lock}
+    G07_ALERT_WEBHOOK: ${G07_ALERT_WEBHOOK:-}
+    G07_SOURCE_PASSWORD: ${G07_SOURCE_PASSWORD:-postgres}
+  volumes:
+    - ./dags:/opt/airflow/dags
+    - ./logs:/opt/airflow/logs
+    - /var/run/docker.sock:/var/run/docker.sock
+  user: "${AIRFLOW_UID:-50000}:0"
+  depends_on:
+    &airflow-common-depends-on
+    postgres:
+      condition: service_healthy
+
+services:
+  postgres:
+    image: postgres:17.11
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "airflow"]
+      interval: 10s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+
+  airflow-apiserver:
+    <<: *airflow-common
+    command: api-server
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/api/v2/monitor/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-scheduler:
+    <<: *airflow-common
+    command: scheduler
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type SchedulerJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  airflow-dag-processor:
+    <<: *airflow-common
+    command: dag-processor
+    healthcheck:
+      test: ["CMD-SHELL", 'airflow jobs check --job-type DagProcessorJob --hostname "$${HOSTNAME}"']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    depends_on:
+      <<: *airflow-common-depends-on
+      airflow-init:
+        condition: service_completed_successfully
+
+  # Migrates the metadata database and creates the local UI user, then exits.
+  airflow-init:
+    <<: *airflow-common
+    entrypoint: /bin/bash
+    command:
+      - -c
+      - |
+        mkdir -v -p /opt/airflow/logs /opt/airflow/dags
+        chown -R "${AIRFLOW_UID:-50000}:0" /opt/airflow/logs
+        exec /entrypoint airflow version
+    environment:
+      <<: *airflow-common-env
+      _AIRFLOW_DB_MIGRATE: "true"
+      _AIRFLOW_WWW_USER_CREATE: "true"
+      _AIRFLOW_WWW_USER_USERNAME: airflow
+      _AIRFLOW_WWW_USER_PASSWORD: airflow
+    user: "0:0"
+
+volumes:
+  airflow-db:

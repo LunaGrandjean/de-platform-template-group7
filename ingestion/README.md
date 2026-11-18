@@ -81,6 +81,23 @@ uv run --locked ingestion/extract_orders.py --once --local-output data/step3-loc
 
 The CLI rejects local output if it could advance the default production state.
 
+### Interval mode (Step 7, used by the scheduler)
+
+```powershell
+uv run --locked ingestion/extract_orders.py --interval-start 2026-09-15 --interval-end 2026-09-16
+```
+
+The period can also come from `INTERVAL_START` and `INTERVAL_END`, which is how the Airflow
+DAG passes `{{ data_interval_start | ds }}`. It selects the orders whose `order_date` falls
+in `[start, end)` and their order lines (both read in one `REPEATABLE READ` transaction),
+needs no cursor file, and writes two new objects per day under the same load id: first
+`bronze/scheduled/order_items/interval_date=D/load_id=L/part-0.parquet`, then
+`bronze/scheduled/orders/interval_date=D/load_id=L/part-0.parquet`. Lines go first, so an
+orders load always has its lines; a run that stops in between leaves only a lines load,
+which silver ignores. Nothing is ever overwritten: a rerun adds a newer load,
+`stg_scheduled_orders` keeps the newest one per day, and `stg_scheduled_order_items` keeps
+the lines of that same load. See [ADR 0007](../docs/adr/0007-idempotency.md).
+
 ## Kafka clickstream consumer
 
 Run the consumer against the `clickstream` topic:

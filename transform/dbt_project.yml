@@ -11,6 +11,12 @@ clean-targets: ["target", "dbt_packages"]
 
 # Every BigQuery resource carries the group labels the course asks for.
 # The materialisation choice is recorded in docs/adr/0005-materialisations.md.
+# Gold reads the Step 2 snapshot for orders dated before this day and the Step 7
+# scheduled extract from this day on. The snapshot's last order is 2026-09-14 and
+# the two share no order_id, so each order has exactly one origin.
+vars:
+  scheduled_orders_from: "2026-09-15"
+
 models:
   albert_marketplace:
     +labels:

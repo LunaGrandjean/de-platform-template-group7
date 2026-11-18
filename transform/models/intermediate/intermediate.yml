@@ -11,6 +11,22 @@ models:
       - name: order_id
         data_tests: [unique, not_null]
 
+  - name: int_order_lines
+    description: >
+      One row per line of a real order, from both origins: the deduplicated snapshot
+      before scheduled_orders_from, the scheduled extract from that day on.
+      GRAIN: (order_id, p_id). order_origin says which.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [order_id, p_id]
+    columns:
+      - name: order_origin
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["snapshot", "scheduled"]
+
   - name: int_buyer_country
     description: "One row per customer: the country of their default address. GRAIN: (customer_id). Resolves the buyer-to-address fan-out with the is_default rule."
     columns:

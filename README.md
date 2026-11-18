@@ -26,10 +26,10 @@ events. The platform targets daily units sold by product and country.
 | Member | GitHub handle | Contribution |
 |---|---|---|
 | Luna Grandjean | [@LunaGrandjean](https://github.com/LunaGrandjean) | Initial platform design and documentation |
-| Omar Abdellatif | [@abdellatifomar61-ship-it](https://github.com/abdellatifomar61-ship-it) | To be documented |
+| Omar Abdellatif | [@abdellatifomar61-ship-it](https://github.com/abdellatifomar61-ship-it) | Step 6 container images (Dockerfiles, Docker Hub tags, reproduction, retention, ADR 0006) and Step 7 Airflow orchestration (DAG, alerts, fire drill, back-fill, runbook, ADR 0007) |
 | Malek Saoudi | [@Msaoudi115](https://github.com/Msaoudi115) | Step 3 live Docker/Debezium deployment and evidence |
 | Anas Mossad | [@realay04](https://github.com/realay04) | To be documented |
-| Emile Gadenne | [@egadenne-ai](https://github.com/egadenne-ai) | Step 4 BigQuery warehouse, costed queries and ADR 0004 |
+| Emile Gadenne | [@egadenne-ai](https://github.com/egadenne-ai) | Step 4 BigQuery warehouse, costed queries and ADR 0004; Step 8 Terraform (adoption by import, remote state, drift, pipeline identity, ADR 0008) |
 
 We are group 7 (`g07`). The cohort identifier has not been provided yet. Add it
 before submitting the group repository.
@@ -165,6 +165,124 @@ clustering comparisons and deliberate maximum-bytes cap failure are verified.
 | [Warehouse script](scripts/warehouse.py) | `external`, `native` and `measure` commands, with row-count and cast prechecks |
 | [Evidence](docs/evidence/step4/) | External and native table metadata, job IDs and query measurements |
 | [Dictionary](docs/data-dictionary.md) and [architecture](docs/architecture.md) | Warehouse schemas and updated status |
+
+### Step 6: Container images
+
+Both jobs now run from images that carry their own interpreter, dependencies and code:
+the Step 3 ingestion jobs and the Step 5 dbt project. Each image is pinned at both
+ends (the base image to a patch version, the dependencies by lock file), runs as a
+non-root user, and contains no credentials.
+
+| Deliverable | Content |
+|---|---|
+| [`ingestion/Dockerfile`](ingestion/Dockerfile) | Step 3 extractors on `python:3.12.12-slim-bookworm`, `uv.lock` installed with `--locked`. Nothing runs by default. |
+| [`transform/Dockerfile`](transform/Dockerfile) | Step 5 dbt project: `dbt-core` 1.12.6 and `dbt-bigquery` 1.12.2 from `uv.lock`, `dbt_utils` 1.4.1 from `package-lock.yml`. `dbt` is the entrypoint. |
+| [`.dockerignore`](.dockerignore) | Allow-list for both builds. `.env`, virtualenvs, `.git` and credential files never enter a build. |
+| [Tag and registry ADR](docs/adr/0006-image-tags.md) | Tag `YYYY-MM-DD-<git sha>`, never `latest`; registry; rollback commands; retention policy, executed on 2026-11-16. |
+| [Reproduction](docs/reproduce.md) | Run, delete, pull, run again, and compare the two digests. Run on 2026-11-12: the digests match. The retention deletion was run on 2026-11-16. |
+
+Images are named `group7-ingestion` and `group7-transform` and are hosted on Docker Hub
+under `omara11/`, in public repositories, so pulling needs no login. They hold
+no secret and no data. Both were pushed on 2026-11-12 as tag `2026-11-12-90355ad`, the commit they were built
+from; their digests are recorded in `docs/reproduce.md`.
+
+#### Install and run the images
+
+You need Docker Desktop running and about 3 GB of free disk. Steps 1 and 2 need
+nothing else. Run everything from the repository root.
+
+1. **Build both images.** The final `.` is the build context, and the root
+   `.dockerignore` applies to it. Use a non-`latest` tag; for a build you mean to keep,
+   use `YYYY-MM-DD-<short sha>`.
+
+   ```
+   docker build -f ingestion/Dockerfile --build-arg GIT_SHA=<short sha> -t omara11/group7-ingestion:<tag> .
+   docker build -f transform/Dockerfile --build-arg GIT_SHA=<short sha> -t omara11/group7-transform:<tag> .
+   ```
+
+2. **Run the ingestion job against the local source, writing to a local volume.** No
+   Google account is needed. Start the source database with `migrate`: on a fresh
+   machine it first downloads the released dataset (66 MB) and restores it, which takes
+   about a minute. Starting `db` on its own would give you an empty database, and the job
+   would fail with `UndefinedTable`. `migrate` does not start the load generator, so the
+   row count stays fixed. (If you started everything with `docker compose up`, run
+   `docker compose stop load-generator` first.)
+
+   ```
+   docker compose up -d migrate
+   docker run --rm --network albert-marketplace_default -e PGHOST=db -e PGDATABASE=marketplace -e PGUSER=postgres -e PGPASSWORD=postgres -e SOURCE_ID=g07-local-check -v g07_state:/state omara11/group7-ingestion:<tag> python ingestion/extract_orders.py --once --local-output /state/bronze --state-file /state/orders-local.json
+   ```
+
+   On a freshly seeded database it prints
+   `{"rows": 222644, "batches": 45, "last_order_id": 222644}`; if the load generator has
+   run, the numbers are higher. Run it again and it prints `"rows": 0`,
+   because the cursor in the `g07_state` volume is already at the end. `docker volume rm
+   g07_state` starts it over.
+
+3. **Run dbt.** This needs your own Google credentials (the Application Default
+   Credentials file from Step 2), mounted read-only. In PowerShell:
+
+   ```
+   $adc = "$env:APPDATA\gcloud\application_default_credentials.json"
+   docker run --rm -v "${adc}:/gcp/adc.json:ro" -e GOOGLE_APPLICATION_CREDENTIALS=/gcp/adc.json -e GOOGLE_CLOUD_PROJECT=data-engineering-i1 omara11/group7-transform:<tag> parse
+   ```
+
+   On macOS or Linux the file is `$HOME/.config/gcloud/application_default_credentials.json`.
+   Replace `parse` with `source freshness` or `build` to run those. **`build` replaces the
+   silver and gold objects in the shared project.**
+
+To pull a pushed image instead of building it, Docker alone is enough. The tag pushed
+so far is `2026-11-12-90355ad`:
+
+```
+docker pull omara11/group7-ingestion:<tag>
+docker pull omara11/group7-transform:<tag>
+```
+
+Things that look wrong and are not:
+
+- A bare `docker run <image>` only prints help. Neither image has a default that writes
+  anything; the job is always chosen on the command line.
+- The extractor's cursor is a file in `/state`. Without a named volume there, every run
+  starts again from order 0.
+- `docker run ... omara11/group7-transform:<tag> debug` ends with one failed check, `git`. The
+  slim image has no `git`, which only git-based dbt packages need; ours come from
+  `package-lock.yml`. The line that matters is `Connection test: OK`.
+
+### Step 7: The pipeline on a schedule
+
+Airflow runs the pipeline every day without a person: the orders for the day, then the
+external table, then `dbt build`, which stops before the marts when a test fails.
+
+| Deliverable | Content |
+|---|---|
+| [DAG](orchestration/dags/marketplace_daily.py) and [compose file](orchestration/compose.yaml) | `marketplace_daily`, three `DockerOperator` tasks on the Step 6 images; Airflow 3.3.2, lean enough for an 8 GB laptop |
+| [Orchestration](docs/orchestration.md) | Set-up, the idempotency note per task, retries and the alert, the fire drill (alarm, then lock), the back-fill with its prediction |
+| [Runbook](docs/runbooks/failed-run.md) | For the person on call: what to look at, what broke this week, and whether a rerun is safe |
+| [ADR 0007](docs/adr/0007-idempotency.md) | How reruns are made safe, the alternative per task, the one we are least sure about |
+
+The extractor gained an interval mode for this step
+([`ingestion/extract_orders.py`](ingestion/extract_orders.py)): it reads the orders of the
+run's period and writes a new, never-overwritten Bronze load per day.
+
+### Step 8: Infrastructure as code
+
+The Bronze bucket, the four `g07_*` datasets and their named grants are declared in
+Terraform and changed only through it. They already existed, so they were adopted with
+import blocks, not recreated; the first plan after adoption said "No changes".
+
+| Deliverable | Content |
+|---|---|
+| [`infra/terraform/`](infra/terraform/) | Terraform 1.17.1, Google provider 8.9.0 pinned with its lock file; 17 adopted resources, `prevent_destroy` on the bucket and datasets |
+| [Infrastructure](docs/infra.md) | How to run it, one line per resource and why it exists, what stays outside Terraform (tables, Docker Hub images), the drift exercise, and the identity the Step 7 pipeline should run as |
+| [ADR 0008](docs/adr/0008-remote-state.md) | State in a versioned GCS bucket of our own, and what to do if it is deleted |
+| [Evidence](docs/evidence/step8/) | Transcripts of the adoption, the provoked drift and the final plans |
+| [CI check](.github/workflows/terraform.yml) | `fmt -check`, `init -backend=false` and `validate` on every PR touching `infra/terraform/`, with no cloud credential |
+
+The pipeline service account is declared with exactly the grants the three DAG tasks need,
+but not created: our accounts cannot create service accounts in the shared project. Until
+the course admin creates it, Airflow runs as a person through the project's default
+bindings ([infra.md](docs/infra.md#the-pipelines-identity-steps-7-and-8)).
 
 ## Start it
 
