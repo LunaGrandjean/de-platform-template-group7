@@ -157,12 +157,15 @@ What was built in `transform/` and how it differs from the sketch above.
 - **Keys:** facts join on the natural keys `p_id`, `country_code` and `date_day`,
   not on surrogate `product_key`, `country_key` and `date_key`. The grain is
   unchanged.
-- **Country:** a buyer with no valid default address fails a test instead of
-  landing in an `UNKNOWN` member. None exists today (100,000 of 100,000 customers
-  have exactly one default address).
+- **Country:** a buyer with no known default address lands in the `UNKNOWN`
+  member of `dim_country` (added in Step 7). The snapshot's 100,000 customers all
+  have one; 46 of the first 2,208 scheduled orders (from 2026-09-15) come from
+  buyers with none in the snapshot, 45 of whom have no address in the source at all.
 - **Input:** the group took the Python ingestion route, not the connector. Gold
-  reads the Step 2 snapshot only. The cursor extract of `orders` has no order
-  lines, so it cannot feed the facts yet.
+  reads the Step 2 snapshot for orders before 2026-09-15 and the Step 7 scheduled
+  daily extract (orders and their lines) from that day on, joined in
+  `int_order_lines` (`order_origin` says which). The two share no order. The
+  Step 3 cursor extract of `orders` has no order lines and still feeds nothing.
 - **Duplicate orders:** resolved once, in `int_orders_deduplicated`, with the
   rule recorded in that model (222,644 orders become 111,322).
 - **Gross amount:** `fct_order_items` and `fct_daily_demand` also carry

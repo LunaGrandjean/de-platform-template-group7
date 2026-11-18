@@ -99,6 +99,35 @@ models:
       - name: order_id
         data_tests: [unique, not_null]
 
+  - name: stg_scheduled_orders
+    description: "Step 7 interval extract of public.orders, newest load per day only. Shares no order_id with stg_orders (the snapshot ends on 2026-09-14); gold joins the two at the scheduled_orders_from cut-over. Overlaps stg_python_orders; never sum those two."
+    columns:
+      - name: order_id
+        data_tests: [unique, not_null]
+      - name: interval_date
+        data_tests: [not_null]
+
+  - name: stg_scheduled_order_items
+    description: "Step 7 interval extract of public.order_items: one row per line of an order in stg_scheduled_orders, from the same load."
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [order_id, p_id]
+    columns:
+      - name: order_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_scheduled_orders')
+                field: order_id
+      - name: p_id
+        data_tests: [not_null]
+      - name: quantity
+        data_tests: [not_null]
+      - name: unit_price_eur
+        data_tests: [not_null]
+
   - name: stg_kafka_clickstream
     description: "One row per clickstream event, deduplicated on event_id (earliest Kafka position). Describes behaviour, not sales."
     columns:

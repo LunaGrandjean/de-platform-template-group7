@@ -68,11 +68,13 @@ These are decisions to confirm, not hidden gaps.
    purchase, before discounts, without returns. That is unambiguous today because
    every `discount_id` is empty and the returns table is empty. It is not net
    revenue, and it must be revisited if discounts or returns start to carry data.
-2. **No UNKNOWN country member.** The design routes unmatched buyers to an
-   `UNKNOWN` member. Here a missing country fails `not_null` instead, which is
-   stricter and currently never triggers (all 100,000 customers have exactly one
-   default address). Add the member if the data can start to contain new
-   sign-ups with no address.
+2. **UNKNOWN country member (added in Step 7).** Until Step 7 a missing country
+   failed `not_null`, which never triggered (all 100,000 snapshot customers have
+   exactly one default address). The scheduled extract brought the case this
+   note anticipated: 46 of the first 2,208 new orders come from buyers with no
+   address in the snapshot, 45 of them with none in the source either. They now
+   land in the `UNKNOWN` member of `dim_country`, as the design sketch says,
+   instead of failing the build or being dropped.
 3. **Country is a proxy.** It is the buyer's default-address country, not the
    delivery country. The mapping is rebuilt at each run, not frozen, so a later
    snapshot can restate history.
@@ -80,6 +82,9 @@ These are decisions to confirm, not hidden gaps.
    and `date_day`, not on `product_key`, `country_key` and `date_key`. The
    grains are unchanged.
 5. **Input.** The design names the connector stream as the sales input and
-   excludes the custom extractor. The group took the Python route instead, and
-   gold reads the Step 2 snapshot only. `python_orders` has no order lines, so
-   it cannot feed the facts yet.
+   excludes the custom extractor. The group took the Python route instead. Gold
+   reads the Step 2 snapshot before 2026-09-15 and the Step 7 scheduled extract
+   (orders and lines, newest load per day) from that day on.
+   `assert_scheduled_orders_reach_gold` fails the build if a scheduled order is
+   missing from gold or loses a line. `python_orders` has no order lines, so it
+   still feeds nothing.
