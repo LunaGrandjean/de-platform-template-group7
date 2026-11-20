@@ -31,7 +31,11 @@ MANIFEST = ROOT / "docs/evidence/step2/landing-manifest.json"
 EVIDENCE_DIR = ROOT / "docs/evidence/step4"
 MAX_BYTES_BILLED = 1_000_000_000  # 1 GB: far above this dataset, far below a mistake
 
-LABELS = {"group": "g07", "layer": "", "step": "l04"}
+# Step 9 label convention (infra/terraform/labels.tf, docs/costs.md).
+LABELS = {"group": "g07", "env": "dev", "layer": "", "component": "warehouse"}
+# Query cost is attributed by the labels on the job, so every job this script
+# runs carries them too (merged into each job's own config by the client).
+JOB_LABELS = {**LABELS, "layer": "warehouse"}
 
 
 def write_json(path: Path, value) -> None:
@@ -157,7 +161,7 @@ CREATE OR REPLACE TABLE `{wh}.orders`
 PARTITION BY DATE_TRUNC(order_date, MONTH)
 OPTIONS (require_partition_filter = TRUE,
          description = "Typed Bronze orders, month partitions; not deduplicated (Silver's job)",
-         labels = [("group", "g07"), ("layer", "warehouse"), ("step", "l04")])
+         labels = [("group", "g07"), ("env", "dev"), ("layer", "warehouse"), ("component", "warehouse")])
 AS
 SELECT
   SAFE_CAST(order_id AS INT64) AS order_id,
@@ -175,7 +179,7 @@ PARTITION BY DATE_TRUNC(order_date, MONTH)
 CLUSTER BY p_id
 OPTIONS (require_partition_filter = TRUE,
          description = "Bronze order_items with the parent order_date; month partitions, clustered by product",
-         labels = [("group", "g07"), ("layer", "warehouse"), ("step", "l04")])
+         labels = [("group", "g07"), ("env", "dev"), ("layer", "warehouse"), ("component", "warehouse")])
 AS
 SELECT
   SAFE_CAST(i.order_id AS INT64) AS order_id,
@@ -544,7 +548,8 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=["external", "external-step3", "native", "measure", "materialize", "verify-cap", "tune", "complete"])
     args = parser.parse_args()
-    client = bigquery.Client(project=PROJECT, location=LOCATION)
+    client = bigquery.Client(project=PROJECT, location=LOCATION,
+                             default_query_job_config=bigquery.QueryJobConfig(labels=JOB_LABELS))
     if args.command == "external":
         external(client, json.loads(MANIFEST.read_text(encoding="utf-8")))
     elif args.command == "external-step3":

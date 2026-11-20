@@ -12,10 +12,11 @@ resource "google_storage_bucket" "bronze" {
   uniform_bucket_level_access = true
   public_access_prevention    = "enforced"
 
+  # group and env come from the provider's default_labels (labels.tf).
+  # Step 9 replaced application/managed-by: neither said who pays.
   labels = {
-    application  = "albert-marketplace"
-    layer        = "bronze"
-    "managed-by" = "python"
+    layer     = "bronze"
+    component = "ingestion"
   }
 
   soft_delete_policy {
@@ -78,9 +79,8 @@ resource "google_bigquery_dataset" "bronze" {
   max_time_travel_hours = "168"
 
   labels = {
-    group = "g07"
-    layer = "bronze"
-    step  = "l04"
+    layer     = "bronze"
+    component = "warehouse"
   }
 
   lifecycle {
@@ -95,9 +95,8 @@ resource "google_bigquery_dataset" "warehouse" {
   max_time_travel_hours = "168"
 
   labels = {
-    group = "g07"
-    layer = "warehouse"
-    step  = "l04"
+    layer     = "warehouse"
+    component = "warehouse"
   }
 
   lifecycle {
@@ -106,11 +105,17 @@ resource "google_bigquery_dataset" "warehouse" {
 }
 
 # Silver and gold were created by `dbt build` (Step 5) with no description and
-# no labels. Adopted as they are; labels come in Step 9.
+# no labels, and adopted that way in Step 8. Labelled from Step 9 on: their
+# spend before 2026-11-19 carries no label and stays unattributable.
 resource "google_bigquery_dataset" "silver" {
   dataset_id            = "g07_silver"
   location              = var.region
   max_time_travel_hours = "168"
+
+  labels = {
+    layer     = "silver"
+    component = "dbt"
+  }
 
   lifecycle {
     prevent_destroy = true
@@ -121,6 +126,11 @@ resource "google_bigquery_dataset" "gold" {
   dataset_id            = "g07_gold"
   location              = var.region
   max_time_travel_hours = "168"
+
+  labels = {
+    layer     = "gold"
+    component = "dbt"
+  }
 
   lifecycle {
     prevent_destroy = true

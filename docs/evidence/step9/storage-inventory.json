@@ -1,0 +1,391 @@
+{
+  "read_at": "2026-11-19",
+  "gcs": {
+    "data-engineering-i1-marketplace-group": {
+      "labels": {
+        "layer": "bronze",
+        "managed-by": "python",
+        "application": "albert-marketplace"
+      },
+      "prefixes": {
+        "bronze/_dlq": [
+          1,
+          323,
+          {
+            "STANDARD": 1
+          }
+        ],
+        "bronze/_manifests": [
+          1,
+          9208,
+          {
+            "STANDARD": 1
+          }
+        ],
+        "bronze/cdc": [
+          2436,
+          163828522,
+          {
+            "STANDARD": 2436
+          }
+        ],
+        "bronze/kafka": [
+          130,
+          6842536,
+          {
+            "STANDARD": 130
+          }
+        ],
+        "bronze/python": [
+          50,
+          9040797,
+          {
+            "STANDARD": 50
+          }
+        ],
+        "bronze/scheduled": [
+          38,
+          359195,
+          {
+            "STANDARD": 38
+          }
+        ],
+        "bronze/snapshot": [
+          19,
+          60949265,
+          {
+            "STANDARD": 19
+          }
+        ]
+      }
+    },
+    "data-engineering-i1-g07-tfstate": {
+      "labels": {
+        "layer": "tfstate",
+        "lesson": "l08",
+        "managed-by": "manual",
+        "group": "g07"
+      },
+      "prefixes": {
+        "platform": [
+          1,
+          37557,
+          {
+            "STANDARD": 1
+          }
+        ]
+      }
+    }
+  },
+  "bigquery_tables": [
+    {
+      "ds": "g07_warehouse",
+      "table_id": "daily_demand",
+      "type": 1,
+      "row_count": 356981,
+      "size_bytes": 9995468
+    },
+    {
+      "ds": "g07_warehouse",
+      "table_id": "order_lines",
+      "type": 1,
+      "row_count": 408560,
+      "size_bytes": 21245120
+    },
+    {
+      "ds": "g07_warehouse",
+      "table_id": "orders",
+      "type": 1,
+      "row_count": 222644,
+      "size_bytes": 12023504
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "customer_shipping",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "kafka_clickstream",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "order_items",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "orders",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "product",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "product_reviews",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "python_orders",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "review",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "scheduled_order_items",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "scheduled_orders",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_bronze",
+      "table_id": "shipping_details",
+      "type": 3,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "int_buyer_country",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "int_order_lines",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "int_orders_deduplicated",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "int_product_review_stats",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_customer_shipping",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_kafka_clickstream",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_order_items",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_orders",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_product",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_product_reviews",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_python_orders",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_review",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_scheduled_order_items",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_scheduled_orders",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_silver",
+      "table_id": "stg_shipping_details",
+      "type": 2,
+      "row_count": 0,
+      "size_bytes": 0
+    },
+    {
+      "ds": "g07_gold",
+      "table_id": "dim_country",
+      "type": 1,
+      "row_count": 7,
+      "size_bytes": 95
+    },
+    {
+      "ds": "g07_gold",
+      "table_id": "dim_date",
+      "type": 1,
+      "row_count": 1461,
+      "size_bytes": 83277
+    },
+    {
+      "ds": "g07_gold",
+      "table_id": "dim_product",
+      "type": 1,
+      "row_count": 42858,
+      "size_bytes": 7579887
+    },
+    {
+      "ds": "g07_gold",
+      "table_id": "fct_daily_demand",
+      "type": 1,
+      "row_count": 207543,
+      "size_bytes": 11622758
+    },
+    {
+      "ds": "g07_gold",
+      "table_id": "fct_order_items",
+      "type": 1,
+      "row_count": 208424,
+      "size_bytes": 23557664
+    }
+  ],
+  "gcs_objects_by_creation_day": [
+    {
+      "day": "2026-10-26",
+      "prefix": "_manifests",
+      "objects": 1,
+      "bytes": 9208
+    },
+    {
+      "day": "2026-10-26",
+      "prefix": "snapshot",
+      "objects": 19,
+      "bytes": 60949265
+    },
+    {
+      "day": "2026-11-05",
+      "prefix": "_dlq",
+      "objects": 1,
+      "bytes": 323
+    },
+    {
+      "day": "2026-11-05",
+      "prefix": "cdc",
+      "objects": 1975,
+      "bytes": 160186203
+    },
+    {
+      "day": "2026-11-05",
+      "prefix": "kafka",
+      "objects": 130,
+      "bytes": 6842536
+    },
+    {
+      "day": "2026-11-05",
+      "prefix": "python",
+      "objects": 50,
+      "bytes": 9040797
+    },
+    {
+      "day": "2026-11-06",
+      "prefix": "cdc",
+      "objects": 461,
+      "bytes": 3642319
+    },
+    {
+      "day": "2026-11-16",
+      "prefix": "scheduled",
+      "objects": 14,
+      "bytes": 146160
+    },
+    {
+      "day": "2026-11-17",
+      "prefix": "scheduled",
+      "objects": 24,
+      "bytes": 213035
+    }
+  ],
+  "dataset_labels_before_step9": {
+    "g07_bronze": {
+      "group": "g07",
+      "layer": "bronze",
+      "step": "l04"
+    },
+    "g07_warehouse": {
+      "group": "g07",
+      "layer": "warehouse",
+      "step": "l04"
+    },
+    "g07_silver": {},
+    "g07_gold": {}
+  },
+  "note": "INFORMATION_SCHEMA.TABLE_STORAGE is not enabled in the project; sizes are __TABLES__.size_bytes (logical)."
+}
