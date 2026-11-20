@@ -21,6 +21,17 @@ variable "create_service_account" {
   default     = false
 }
 
+variable "import_service_account" {
+  description = <<-EOT
+    Set to true (with create_service_account = true) only if the course admin
+    created g07-pipeline for us: Terraform then imports the existing account
+    instead of creating it again, which would fail with 409. Leave false if the
+    admin grants us iam.serviceAccounts.create and Terraform creates it.
+  EOT
+  type        = bool
+  default     = false
+}
+
 variable "dataset_readers" {
   description = "Group members with read access to g07_bronze."
   type        = list(string)

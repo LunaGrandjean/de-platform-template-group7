@@ -5,12 +5,15 @@
 #
 # Declared but NOT created: in the shared course project our accounts lack
 # iam.serviceAccounts.create (testIamPermissions, 2026-11-08). Set
-# create_service_account = true once the course admin grants it.
+# create_service_account = true once the course admin grants it. If the admin
+# creates the account instead, also set import_service_account = true so that
+# Terraform adopts it (imports.tf) rather than creating it again (409).
 # No key is ever created for it: workloads use impersonation or the runtime's
 # attached identity, so no credential file can leak.
 #
 # The grants match what the three DAG tasks do:
-#   extract_orders       writes bronze/scheduled/... objects        -> objectUser on the bucket
+#   extract_orders       get_bucket() checks the bucket's region,   -> legacyBucketReader on the bucket
+#                        then writes bronze/scheduled/... objects    and objectUser on the bucket
 #   create_bronze_table  CREATE OR REPLACE EXTERNAL TABLE           -> dataEditor on g07_bronze
 #                        g07_bronze.scheduled_orders / _order_items
 #   dbt_build            reads g07_bronze and g07_warehouse,        -> dataEditor on g07_silver
@@ -34,6 +37,17 @@ resource "google_storage_bucket_iam_member" "pipeline_bronze" {
   count  = var.create_service_account ? 1 : 0
   bucket = google_storage_bucket.bronze.name
   role   = "roles/storage.objectUser"
+  member = "serviceAccount:${google_service_account.pipeline[0].email}"
+}
+
+# GCSStore.__init__ (ingestion/common.py) calls get_bucket() to check the region
+# before any upload: that needs storage.buckets.get, which objectUser lacks.
+# legacyBucketReader is the narrowest role with it (buckets.get + objects.list,
+# no write, no IAM change).
+resource "google_storage_bucket_iam_member" "pipeline_bronze_metadata" {
+  count  = var.create_service_account ? 1 : 0
+  bucket = google_storage_bucket.bronze.name
+  role   = "roles/storage.legacyBucketReader"
   member = "serviceAccount:${google_service_account.pipeline[0].email}"
 }
 

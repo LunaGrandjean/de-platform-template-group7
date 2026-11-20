@@ -74,15 +74,27 @@ that gives it:
 
 | Task | Does | Binding |
 |---|---|---|
-| `extract_orders` | writes `bronze/scheduled/{orders,order_items}/…` | `roles/storage.objectUser` on the bucket |
+| `extract_orders` | reads the bucket's metadata (`get_bucket()` checks its region), then writes `bronze/scheduled/{orders,order_items}/…` | `roles/storage.legacyBucketReader` (for `storage.buckets.get`) and `roles/storage.objectUser` on the bucket |
 | `create_bronze_table` | `CREATE OR REPLACE EXTERNAL TABLE` on `g07_bronze.scheduled_orders` and `scheduled_order_items` | `roles/bigquery.dataEditor` on `g07_bronze` |
 | `dbt_build` | reads `g07_bronze` and `g07_warehouse`, writes views in `g07_silver` and tables in `g07_gold` | `roles/bigquery.dataEditor` on `g07_silver` and `g07_gold` (and on `g07_warehouse`, for the Step 4 loads once scheduled) |
 | every task that queries | runs BigQuery jobs | `roles/bigquery.jobUser` at **project level**: not in Terraform, asked of the course admin with the account |
 
-Switch-over, once the admin creates the account (or grants the permission):
-`apply` with `create_service_account = true`, replace the credentials in
-`g07_gcloud` with the account's impersonated credentials (never a key), rerun
-one day of the DAG, and only then remove the personal write paths in Step 10.
+Switch-over depends on who creates the account:
+
+- **The admin grants us `iam.serviceAccounts.create`:** set
+  `create_service_account = true` only. The plan must show the account and its
+  grants as `to add`.
+- **The admin creates `g07-pipeline` for us:** set both
+  `create_service_account = true` and `import_service_account = true`. The
+  conditional block in [`imports.tf`](../infra/terraform/imports.tf) adopts the
+  existing account into `google_service_account.pipeline[0]`; the plan must
+  show it as `1 to import`, never `to add` (creating it again fails with 409).
+  `import_service_account` can go back to `false` once it is in state.
+
+In both cases: a fresh `plan` first (none has run since billing was disabled on
+2026-11-18), then `apply`, replace the credentials in `g07_gcloud` with the
+account's impersonated credentials (never a key), rerun one day of the DAG, and
+only then remove the personal write paths in Step 10.
 
 ## Adoption: import, not recreate
 

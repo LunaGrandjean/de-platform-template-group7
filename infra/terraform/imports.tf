@@ -64,3 +64,12 @@ import {
   to = google_bigquery_dataset_iam_member.gold_owner
   id = "${local.ds_iam}/g07_gold roles/bigquery.dataOwner ${local.dbt_owner}"
 }
+
+# Only when the course admin creates g07-pipeline for us (docs/infra.md,
+# "The pipeline's identity"): adopt it instead of creating it again.
+# Empty set by default, so this block plans nothing.
+import {
+  for_each = var.create_service_account && var.import_service_account ? toset(["g07-pipeline"]) : toset([])
+  to       = google_service_account.pipeline[0]
+  id       = "projects/${var.project_id}/serviceAccounts/${each.value}@${var.project_id}.iam.gserviceaccount.com"
+}
