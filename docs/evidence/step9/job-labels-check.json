@@ -1,0 +1,6 @@
+{
+  "checked_at": "2026-11-19T22:35:44Z",
+  "what": "dbt show --inline 'select 1 as label_check' run from transform/ with the Step 9 query-comment, read back from INFORMATION_SCHEMA.JOBS_BY_USER",
+  "total_bytes_billed": 0,
+  "labels": {"group": "g07", "env": "dev", "component": "dbt", "layer": "none", "resource": "sql_operation", "dbt_invocation_id": "21adad6c-cd1a-4753-a29e-fa04081b2e25"}
+}

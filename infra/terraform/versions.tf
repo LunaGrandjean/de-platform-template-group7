@@ -23,4 +23,10 @@ terraform {
 provider "google" {
   project = var.project_id
   region  = var.region
+
+  # Step 9 label convention (docs/costs.md): `group` and `env` are the same on
+  # every resource, so the provider stamps them on everything that takes labels.
+  # Each resource adds its own `layer` and `component`. A resource-level label
+  # with the same key wins over these.
+  default_labels = local.default_labels
 }

@@ -156,6 +156,8 @@ Until then nobody runs `apply`, because it would silently revert the fix.
 - `plan` does not run in CI: that needs a GCP identity for GitHub (Workload
   Identity Federation), which needs the same admin permission as the service
   account.
-- Labels on Silver and Gold, and a budget alert: Step 9.
+- Labels on Silver and Gold, and a budget alert: done in Step 9 (labels on every
+  resource through `default_labels`; the budget is declared but not created, see
+  [costs.md](costs.md#2-budget-alert)).
 - Removing the broad project default bindings: Step 10, and only after the
   pipeline runs as the service account (see "The pipeline's identity").

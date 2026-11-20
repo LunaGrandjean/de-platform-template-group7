@@ -1,0 +1,27 @@
+{
+  "read_at": "2026-11-19",
+  "region": "europe-west1 (Belgium)",
+  "currency": "USD, list, before tax and credits",
+  "method": "Regional price data embedded in the official pages, entry labelled 'Belgium (europe-west1)'; the visible default table shows Iowa and is not used.",
+  "bigquery": {
+    "url": "https://cloud.google.com/bigquery/pricing",
+    "on_demand_queries_per_tib": 7.50,
+    "on_demand_free_tier": "first 1 TiB per month, per billing account",
+    "active_logical_storage_per_gib_month": 0.02,
+    "long_term_logical_storage_per_gib_month": 0.01,
+    "active_physical_storage_per_gib_month": 0.044,
+    "storage_free_tier": "first 10 GiB per month",
+    "time_travel_on_logical_billing": "not charged"
+  },
+  "cloud_storage": {
+    "url": "https://cloud.google.com/storage/pricing",
+    "standard_per_gib_month": 0.02,
+    "nearline_per_gib_month": 0.01,
+    "coldline_per_gib_month": 0.004,
+    "archive_per_gib_month": 0.0012,
+    "class_a_per_1000_standard": 0.005,
+    "class_b_per_1000_standard": 0.0004,
+    "class_a_b_source": "Step 2 lookup of 2026-10-26 (docs/costs.md), not re-read on 2026-11-19",
+    "not_looked_up": "Nearline/Coldline operation and retrieval rates"
+  }
+}

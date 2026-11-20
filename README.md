@@ -28,7 +28,7 @@ events. The platform targets daily units sold by product and country.
 | Luna Grandjean | [@LunaGrandjean](https://github.com/LunaGrandjean) | Initial platform design and documentation |
 | Omar Abdellatif | [@abdellatifomar61-ship-it](https://github.com/abdellatifomar61-ship-it) | Step 6 container images (Dockerfiles, Docker Hub tags, reproduction, retention, ADR 0006) and Step 7 Airflow orchestration (DAG, alerts, fire drill, back-fill, runbook, ADR 0007) |
 | Malek Saoudi | [@Msaoudi115](https://github.com/Msaoudi115) | Step 3 live Docker/Debezium deployment and evidence |
-| Anas Mossad | [@realay04](https://github.com/realay04) | To be documented |
+| Anas Mossad | [@realay04](https://github.com/realay04) | Step 9 FinOps: label convention (Terraform, dbt jobs), budget, largest-cost analysis, the frozen-snapshot test optimisation, the ledger and ADR 0009 |
 | Emile Gadenne | [@egadenne-ai](https://github.com/egadenne-ai) | Step 4 BigQuery warehouse, costed queries and ADR 0004; Step 8 Terraform (adoption by import, remote state, drift, pipeline identity, ADR 0008) |
 
 We are group 7 (`g07`). The cohort identifier has not been provided yet. Add it
@@ -283,6 +283,25 @@ The pipeline service account is declared with exactly the grants the three DAG t
 but not created: our accounts cannot create service accounts in the shared project. Until
 the course admin creates it, Airflow runs as a person through the project's default
 bindings ([infra.md](docs/infra.md#the-pipelines-identity-steps-7-and-8)).
+
+### Step 9: Attributable, and one saving measured
+
+Every resource and every BigQuery job our code runs now carries four labels (`group`,
+`env`, `layer`, `component`), so what the pipeline costs is a query, not a guess. Spend
+before 2026-11-19 carries no label and stays unattributable. Our largest cost is BigQuery
+Analysis (25.1 GiB billed in November, 0.00 invoiced inside the free tier). One daily
+`dbt build` billed 1,215 MiB; skipping the tests of the frozen Step 2 snapshot on six days
+out of seven brought it to 772 MiB (-36.5%), measured on 2026-11-19 with gold unchanged.
+
+| Deliverable | Content |
+|---|---|
+| [Label convention](docs/costs.md#1-label-convention) | Four keys and why each exists, applied by Terraform [`default_labels`](infra/terraform/labels.tf), dbt job labels ([macro](transform/macros/g07_query_comment.sql)) and `scripts/warehouse.py`; what is already unattributable |
+| [Budget alert](infra/terraform/budget.tf) | Label-scoped budget, one named recipient, and what it does not stop. Declared, not created: the billing API is closed to us |
+| [Largest cost](docs/costs.md#4-largest-cost-its-sku-and-its-shape) | BigQuery Analysis by SKU, its daily shape (shape 1 on 11-16, shape 4 going forward) and the 10 MB-per-table overhead |
+| [One optimisation](docs/costs.md#5-one-optimisation-with-a-before-and-an-after) | [`selectors.yml`](transform/selectors.yml) and the [DAG](orchestration/dags/marketplace_daily.py): before, after, units and what would prove it wrong |
+| [Ledger](docs/costs.md#6-the-ledger) | One row per resource, with the unit price and the date it was read |
+| [ADR 0009](docs/adr/0009-cost-attribution.md) | Labels on resources and jobs over a project per team, tags or a manual split, and what changes at ten teams |
+| [Evidence](docs/evidence/step9/) | Daily bytes, the 11-17 build job by job, storage inventory, prices, label check, selections and the label-only `terraform plan` |
 
 ## Start it
 

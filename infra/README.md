@@ -17,5 +17,7 @@ CI checks every change to `terraform/` with `fmt -check`, `init -backend=false`
 and `validate`, with no cloud credential. `plan` and `apply` stay manual and
 authenticated (see `docs/infra.md`).
 
-Next: **Step 9** adds labels and a budget; **Step 10** tightens access, once the
+**Step 9** added the label convention ([`labels.tf`](terraform/labels.tf)) and a
+label-scoped budget ([`budget.tf`](terraform/budget.tf), declared but not created);
+see [`docs/costs.md`](../docs/costs.md). Next: **Step 10** tightens access, once the
 pipeline runs as its own service account.

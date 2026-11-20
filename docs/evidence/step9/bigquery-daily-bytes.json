@@ -1,0 +1,95 @@
+{
+  "source": "region-europe-west1.INFORMATION_SCHEMA.JOBS, job_type=QUERY, jobs referencing or writing a g07_* dataset",
+  "queried_at": "2026-11-19",
+  "why_not_billing_export": "No billing export dataset exists in data-engineering-i1 and the Cloud Billing API is disabled (403 SERVICE_DISABLED); see billing-access.json",
+  "caveat": "Days on which nothing ran have no row (Oct, 11-07..11, 11-13..15, 11-18).",
+  "days": [
+    {
+      "day": "2026-11-05",
+      "jobs": 27,
+      "bytes_billed": 223346688,
+      "gib_billed": 0.208
+    },
+    {
+      "day": "2026-11-06",
+      "jobs": 618,
+      "bytes_billed": 7130316800,
+      "gib_billed": 6.641
+    },
+    {
+      "day": "2026-11-12",
+      "jobs": 88,
+      "bytes_billed": 1006632960,
+      "gib_billed": 0.938
+    },
+    {
+      "day": "2026-11-16",
+      "jobs": 1249,
+      "bytes_billed": 13321109504,
+      "gib_billed": 12.406
+    },
+    {
+      "day": "2026-11-17",
+      "jobs": 432,
+      "bytes_billed": 5255462912,
+      "gib_billed": 4.895
+    },
+    {
+      "day": "2026-11-19",
+      "jobs": 1,
+      "bytes_billed": 0,
+      "gib_billed": 0.0
+    }
+  ],
+  "total_bytes_billed": 26936868864,
+  "total_gib_billed": 25.087,
+  "per_user_and_day": [
+    {
+      "day": "2026-11-05",
+      "user_email": "egadenne@albertschool.com",
+      "jobs": 27,
+      "billed": 223346688,
+      "processed": 95844605
+    },
+    {
+      "day": "2026-11-06",
+      "user_email": "lgrandjean@albertschool.com",
+      "jobs": 72,
+      "billed": 800063488,
+      "processed": 342322607
+    },
+    {
+      "day": "2026-11-06",
+      "user_email": "msaoudi@albertschool.com",
+      "jobs": 546,
+      "billed": 6330253312,
+      "processed": 2250493585
+    },
+    {
+      "day": "2026-11-12",
+      "user_email": "oabdellatif@albertschool.com",
+      "jobs": 88,
+      "billed": 1006632960,
+      "processed": 335641507
+    },
+    {
+      "day": "2026-11-16",
+      "user_email": "oabdellatif@albertschool.com",
+      "jobs": 1249,
+      "billed": 13321109504,
+      "processed": 4340264341
+    },
+    {
+      "day": "2026-11-17",
+      "user_email": "oabdellatif@albertschool.com",
+      "jobs": 432,
+      "billed": 5255462912,
+      "processed": 1573269736
+    }
+  ],
+  "project_total_since_2026-11-01": {
+    "jobs": 11943,
+    "billed": 123541127168,
+    "users": 26
+  }
+}

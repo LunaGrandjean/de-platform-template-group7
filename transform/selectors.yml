@@ -1,0 +1,27 @@
+# Step 9 optimisation (docs/costs.md, "One optimisation"). The DAG runs
+# `dbt build --selector daily` six days a week and `--selector full` on Mondays.
+selectors:
+  - name: full
+    description: Everything. Weekly, and before merging any change to transform/.
+    definition:
+      method: fqn
+      value: "*"
+
+  - name: daily
+    description: >
+      Everything except the tests whose every parent is a frozen_snapshot model.
+      Those models read the Step 2 snapshot, which never changes, so their tests
+      return the same answer every day and only cost the bytes. Tests with one
+      parent that changes (assert_reconciled_lines_preserved reads the snapshot
+      and the scheduled extract) still run: that is what cautious means here.
+      The frozen views themselves are skipped too; rebuilding an unchanged view
+      costs nothing and changes nothing.
+    default: false
+    definition:
+      union:
+        - method: fqn
+          value: "*"
+        - exclude:
+            - method: tag
+              value: frozen_snapshot
+              indirect_selection: cautious

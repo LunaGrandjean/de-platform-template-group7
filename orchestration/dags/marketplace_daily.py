@@ -136,10 +136,16 @@ with DAG(
         ["run-operation", "create_scheduled_orders_table"], GOOGLE_ENV,
     )
 
+    # Step 9 (docs/costs.md, "One optimisation"): the tests of models that read only the
+    # frozen Step 2 snapshot run on Mondays (`full`), not every day (`daily`). Same answer
+    # every day, so the other six runs only paid for the bytes. transform/selectors.yml
+    # must be in the image: this needs a transform image built from Step 9 or later.
+    SELECTOR = ["--selector", "{{ 'full' if data_interval_start.weekday() == 0 else 'daily' }}"]
+
     if GATE == "alarm":
-        dbt_run = container("dbt_run", TRANSFORM_IMAGE, ["run"], GOOGLE_ENV)
-        dbt_test = container("dbt_test", TRANSFORM_IMAGE, ["test"], GOOGLE_ENV)
+        dbt_run = container("dbt_run", TRANSFORM_IMAGE, ["run", *SELECTOR], GOOGLE_ENV)
+        dbt_test = container("dbt_test", TRANSFORM_IMAGE, ["test", *SELECTOR], GOOGLE_ENV)
         extract_orders >> create_bronze_table >> dbt_run >> dbt_test
     else:
-        dbt_build = container("dbt_build", TRANSFORM_IMAGE, ["build"], GOOGLE_ENV)
+        dbt_build = container("dbt_build", TRANSFORM_IMAGE, ["build", *SELECTOR], GOOGLE_ENV)
         extract_orders >> create_bronze_table >> dbt_build

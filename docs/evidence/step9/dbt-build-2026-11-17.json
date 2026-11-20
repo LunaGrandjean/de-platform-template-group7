@@ -1,0 +1,738 @@
+{
+  "what": "Every job of the last scheduled dbt build of 2026-11-17 (one dbt_invocation_id), the BEFORE figure",
+  "jobs": 104,
+  "bytes_billed": 1274019840,
+  "bytes_processed": 381867326,
+  "mib_billed": 1215.0,
+  "mib_processed": 364.2,
+  "nodes": [
+    {
+      "node": "model.albert_marketplace.fct_order_items",
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 62914560,
+      "processed": 48267552,
+      "referenced_tables": "g07_bronze.customer_shipping g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders g07_bronze.shipping_details"
+    },
+    {
+      "node": "test.albert_marketplace.assert_reconciled_lines_preserved",
+      "statement": "SELECT",
+      "billed": 62914560,
+      "processed": 32415295,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders g07_gold.fct_daily_demand g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.dbt_utils_unique_combination_of_columns_int_order_lines_order_id__p_id.d351a54396",
+      "statement": "SELECT",
+      "billed": 41943040,
+      "processed": 32738401,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "model.albert_marketplace.dim_product",
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 31457280,
+      "processed": 10006600,
+      "referenced_tables": "g07_bronze.product g07_bronze.product_reviews g07_bronze.review"
+    },
+    {
+      "node": "test.albert_marketplace.assert_scheduled_orders_reach_gold",
+      "statement": "SELECT",
+      "billed": 31457280,
+      "processed": 5663800,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_int_orders_deduplicated_order_id.93881bd080",
+      "statement": "SELECT",
+      "billed": 25165824,
+      "processed": 24563750,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders"
+    },
+    {
+      "node": "test.albert_marketplace.unique_int_orders_deduplicated_order_id.dd4a74ead2",
+      "statement": "SELECT",
+      "billed": 25165824,
+      "processed": 24563750,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders"
+    },
+    {
+      "node": "test.albert_marketplace.assert_dedup_halves_orders",
+      "statement": "SELECT",
+      "billed": 25165824,
+      "processed": 24563750,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders"
+    },
+    {
+      "node": "test.albert_marketplace.assert_twin_groups_are_even",
+      "statement": "SELECT",
+      "billed": 22020096,
+      "processed": 21892022,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_scheduled_order_items_p_id.5e77c8023e",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 124456,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.relationships_fct_order_items_order_date__date_day__ref_dim_date_.6c94075c2f",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 1679080,
+      "referenced_tables": "g07_gold.dim_date g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.unique_int_buyer_country_customer_id.97e3df089d",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 9577832,
+      "referenced_tables": "g07_bronze.customer_shipping g07_bronze.shipping_details"
+    },
+    {
+      "node": "test.albert_marketplace.dbt_utils_unique_combination_of_columns_stg_scheduled_order_items_order_id__p_id.fbb964eb86",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 124456,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_int_buyer_country_country_code.09499b0b23",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 5232143,
+      "referenced_tables": "g07_bronze.customer_shipping g07_bronze.shipping_details"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_int_product_review_stats_p_id.3f9ad54f08",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 3109018,
+      "referenced_tables": "g07_bronze.product_reviews g07_bronze.review"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_scheduled_order_items_order_id.ff3269c0e1",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 41496,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.relationships_stg_scheduled_order_items_order_id__order_id__ref_stg_scheduled_orders_.51e6c02f8b",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 116176,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.assert_daily_demand_matches_order_items",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 9983208,
+      "referenced_tables": "g07_gold.fct_daily_demand g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_int_buyer_country_customer_id.a00156eaaf",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 9577832,
+      "referenced_tables": "g07_bronze.customer_shipping g07_bronze.shipping_details"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_scheduled_order_items_quantity.f8d147effb",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 41496,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.relationships_fct_daily_demand_country_code__country_code__ref_dim_country_.093a1f08ad",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 830555,
+      "referenced_tables": "g07_gold.dim_country g07_gold.fct_daily_demand"
+    },
+    {
+      "node": "test.albert_marketplace.unique_int_product_review_stats_p_id.bfdb5f69d0",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 3109018,
+      "referenced_tables": "g07_bronze.product_reviews g07_bronze.review"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_scheduled_order_items_unit_price_eur.e2ff2c61f2",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 141048,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.relationships_fct_daily_demand_order_date__date_day__ref_dim_date_.838778c4d9",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 1672032,
+      "referenced_tables": "g07_gold.dim_date g07_gold.fct_daily_demand"
+    },
+    {
+      "node": "test.albert_marketplace.relationships_fct_daily_demand_p_id__p_id__ref_dim_product_.135327b84b",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 3004812,
+      "referenced_tables": "g07_gold.dim_product g07_gold.fct_daily_demand"
+    },
+    {
+      "node": "test.albert_marketplace.relationships_fct_order_items_country_code__country_code__ref_dim_country_.e923c6eb0e",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 834079,
+      "referenced_tables": "g07_gold.dim_country g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.relationships_fct_order_items_p_id__p_id__ref_dim_product_.1e3d955e3c",
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 3015384,
+      "referenced_tables": "g07_gold.dim_product g07_gold.fct_order_items"
+    },
+    {
+      "node": "model.albert_marketplace.fct_daily_demand",
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 12582912,
+      "processed": 11672094,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.dbt_utils_accepted_range_fct_order_items_unit_price_eur__True__0.ce29b52e55",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 3334784,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_dim_date_date_day.e3f312efb2",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 11688,
+      "referenced_tables": "g07_gold.dim_date"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_dim_product_p_id.89199d2487",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 514296,
+      "referenced_tables": "g07_gold.dim_product"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_dim_product_p_name.605f119326",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 5020687,
+      "referenced_tables": "g07_gold.dim_product"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_fct_daily_demand_country_code.7cd57459da",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 830522,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_fct_daily_demand_p_id.3a598e9625",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2490516,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_fct_order_items_p_id.4dda452770",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2501088,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_customer_shipping_address_id.a158b79c58",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1488895,
+      "referenced_tables": "g07_bronze.customer_shipping"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_customer_shipping_is_default.a2075717db",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 600000,
+      "referenced_tables": "g07_bronze.customer_shipping"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_order_items_unit_price_eur.76e36b86bb",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2772456,
+      "referenced_tables": "g07_bronze.order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_product_price_eur.c2d9436ddd",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 732093,
+      "referenced_tables": "g07_bronze.product"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_shipping_details_address_id.de2993eb27",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1488895,
+      "referenced_tables": "g07_bronze.shipping_details"
+    },
+    {
+      "node": "test.albert_marketplace.unique_dim_date_date_day.d56fd19199",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 11688,
+      "referenced_tables": "g07_gold.dim_date"
+    },
+    {
+      "node": "test.albert_marketplace.unique_stg_kafka_clickstream_event_id.bdd5b041f3",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1573776,
+      "referenced_tables": "g07_bronze.kafka_clickstream"
+    },
+    {
+      "node": "test.albert_marketplace.dbt_utils_accepted_range_stg_review_rating__True__5__1.8e67cbd7f7",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 333966,
+      "referenced_tables": "g07_bronze.review"
+    },
+    {
+      "node": "test.albert_marketplace.dbt_utils_unique_combination_of_columns_fct_order_items_order_id__p_id.137e2295f1",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 4168480,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_dim_product_review_count.b027f20543",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 342864,
+      "referenced_tables": "g07_gold.dim_product"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_order_items_is_zero_price.b5e513a73b",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2772456,
+      "referenced_tables": "g07_bronze.order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_order_items_quantity.ae199f05a7",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1268470,
+      "referenced_tables": "g07_bronze.order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_orders_order_id.81cfe2fe64",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1670047,
+      "referenced_tables": "g07_bronze.orders"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_scheduled_orders_order_id.31789e97f2",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 41496,
+      "referenced_tables": "g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.unique_stg_product_p_id.202f680e62",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 514296,
+      "referenced_tables": "g07_bronze.product"
+    },
+    {
+      "node": "test.albert_marketplace.accepted_values_stg_kafka_clickstream_event_type__product_viewed__added_to_cart__order_placed.72090133e5",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2029323,
+      "referenced_tables": "g07_bronze.kafka_clickstream"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_fct_daily_demand_order_date.ae6c407669",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1660344,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_fct_order_items_order_origin.70d782dbdf",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2088384,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_customer_shipping_customer_id.a1d97cc478",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 6000064,
+      "referenced_tables": "g07_bronze.customer_shipping"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_order_items_p_id.126afa30b8",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 4902720,
+      "referenced_tables": "g07_bronze.order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_product_p_id.75421a3b86",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 514296,
+      "referenced_tables": "g07_bronze.product"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_product_reviews_review_id.63b1246457",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 886577,
+      "referenced_tables": "g07_bronze.product_reviews"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_review_rating.0137697481",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 333966,
+      "referenced_tables": "g07_bronze.review"
+    },
+    {
+      "node": "test.albert_marketplace.unique_dim_country_country_code.b4003b73de",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 33,
+      "referenced_tables": "g07_gold.dim_country"
+    },
+    {
+      "node": "test.albert_marketplace.unique_stg_python_orders_order_id.bbfc07d85f",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1803048,
+      "referenced_tables": "g07_bronze.python_orders"
+    },
+    {
+      "node": "test.albert_marketplace.unique_stg_review_review_id.c2c484bf14",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 886577,
+      "referenced_tables": "g07_bronze.review"
+    },
+    {
+      "node": "test.albert_marketplace.unique_stg_shipping_details_address_id.4b100cff7e",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1488903,
+      "referenced_tables": "g07_bronze.shipping_details"
+    },
+    {
+      "node": "model.albert_marketplace.dim_country",
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 10485760,
+      "processed": 1654345,
+      "referenced_tables": "g07_bronze.shipping_details"
+    },
+    {
+      "node": "test.albert_marketplace.dbt_utils_accepted_range_fct_daily_demand_units_sold__True__1.487e18b915",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1660344,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "node": "test.albert_marketplace.dbt_utils_accepted_range_fct_order_items_quantity__True__1.c42aafb3c2",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1667392,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_fct_order_items_order_date.1686609ba5",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1667392,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_fct_order_items_order_id.e887a2de02",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1667392,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.unique_stg_scheduled_orders_order_id.fc9b07d4be",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 41496,
+      "referenced_tables": "g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.accepted_values_fct_order_items_order_origin__snapshot__scheduled.4cf77c8261",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2088384,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.dbt_utils_unique_combination_of_columns_fct_daily_demand_p_id__country_code__order_date.2d563e5021",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 4981382,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_dim_country_country_code.4eebc314d4",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 33,
+      "referenced_tables": "g07_gold.dim_country"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_fct_order_items_country_code.d7384589d4",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 834046,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_order_items_order_id.2063801f96",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 3064483,
+      "referenced_tables": "g07_bronze.order_items"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_orders_buyer_id.246a39c3f5",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 6680048,
+      "referenced_tables": "g07_bronze.orders"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_orders_order_date.2177a3e8bb",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2671728,
+      "referenced_tables": "g07_bronze.orders"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_product_reviews_p_id.8a8fefb507",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1335864,
+      "referenced_tables": "g07_bronze.product_reviews"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_review_review_id.dfc482ab5f",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 886577,
+      "referenced_tables": "g07_bronze.review"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_shipping_details_country_code.952c1db8b7",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1654345,
+      "referenced_tables": "g07_bronze.shipping_details"
+    },
+    {
+      "node": "test.albert_marketplace.unique_dim_product_p_id.54f84a5a00",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 514296,
+      "referenced_tables": "g07_gold.dim_product"
+    },
+    {
+      "node": "test.albert_marketplace.unique_stg_customer_shipping_address_id.658764b556",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1488903,
+      "referenced_tables": "g07_bronze.customer_shipping"
+    },
+    {
+      "node": "test.albert_marketplace.unique_stg_orders_order_id.e3b841c71a",
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1670047,
+      "referenced_tables": "g07_bronze.orders"
+    },
+    {
+      "node": "model.albert_marketplace.int_order_lines",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "model.albert_marketplace.stg_product_reviews",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.product_reviews"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_scheduled_orders_interval_date.ea325b30c1",
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "model.albert_marketplace.int_orders_deduplicated",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders"
+    },
+    {
+      "node": "model.albert_marketplace.stg_orders",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.orders"
+    },
+    {
+      "node": "model.albert_marketplace.stg_scheduled_orders",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.accepted_values_stg_shipping_details_country_code__DE__FR__IT__ES__NL__BE.0eafc23024",
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.shipping_details"
+    },
+    {
+      "node": "model.albert_marketplace.stg_kafka_clickstream",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.kafka_clickstream"
+    },
+    {
+      "node": "model.albert_marketplace.stg_order_items",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.order_items"
+    },
+    {
+      "node": "model.albert_marketplace.stg_python_orders",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.python_orders"
+    },
+    {
+      "node": "model.albert_marketplace.stg_shipping_details",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.shipping_details"
+    },
+    {
+      "node": "test.albert_marketplace.dbt_utils_accepted_range_stg_orders_discount_id__True__0__0.4961a1692b",
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.orders"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_kafka_clickstream_event_id.9dd1c7df54",
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.kafka_clickstream"
+    },
+    {
+      "node": "model.albert_marketplace.dim_date",
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": ""
+    },
+    {
+      "node": "model.albert_marketplace.stg_review",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.review"
+    },
+    {
+      "node": "test.albert_marketplace.not_null_stg_python_orders_order_id.db27d57a61",
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.python_orders"
+    },
+    {
+      "node": "model.albert_marketplace.dim_date",
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": ""
+    },
+    {
+      "node": "model.albert_marketplace.int_buyer_country",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.customer_shipping g07_bronze.shipping_details"
+    },
+    {
+      "node": "model.albert_marketplace.int_product_review_stats",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.product_reviews g07_bronze.review"
+    },
+    {
+      "node": "model.albert_marketplace.stg_customer_shipping",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.customer_shipping"
+    },
+    {
+      "node": "model.albert_marketplace.stg_product",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.product"
+    },
+    {
+      "node": "model.albert_marketplace.stg_scheduled_order_items",
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "node": "test.albert_marketplace.accepted_values_int_order_lines_order_origin__snapshot__scheduled.dec4cbda1e",
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    }
+  ]
+}
