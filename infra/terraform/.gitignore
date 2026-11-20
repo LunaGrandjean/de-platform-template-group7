@@ -1,0 +1,8 @@
+# State lives in gs://data-engineering-i1-g07-tfstate, never in git.
+.terraform/
+terraform.tfstate
+terraform.tfstate.*
+*.tfplan
+crash.log
+crash.*.log
+# .terraform.lock.hcl IS committed: it pins the provider checksums.

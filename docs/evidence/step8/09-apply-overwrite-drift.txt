@@ -1,0 +1,4 @@
+google_bigquery_dataset.bronze: Modifying... [id=projects/data-engineering-i1/datasets/g07_bronze]
+google_bigquery_dataset.bronze: Modifications complete after 1s [id=projects/data-engineering-i1/datasets/g07_bronze]
+
+Apply complete! Resources: 0 added, 1 changed, 0 destroyed.

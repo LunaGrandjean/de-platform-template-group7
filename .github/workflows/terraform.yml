@@ -1,0 +1,43 @@
+# Checks every change to infra/terraform before it is reviewed.
+# No cloud credential is needed: `init -backend=false` skips the GCS state, and
+# fmt/validate only read the code. `plan` stays a manual, authenticated step
+# (docs/infra.md), so the repo never holds a GCP key.
+name: terraform
+
+on:
+  pull_request:
+    paths:
+      - "infra/terraform/**"
+      - ".github/workflows/terraform.yml"
+  push:
+    branches: [main]
+    paths:
+      - "infra/terraform/**"
+      - ".github/workflows/terraform.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: infra/terraform
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.17.1 # same as versions.tf and the laptops
+
+      - name: terraform fmt -check
+        run: terraform fmt -check -recursive -diff
+
+      - name: terraform init (no backend)
+        # -lockfile=readonly: fail if the committed .terraform.lock.hcl does not
+        # cover the pinned provider for linux_amd64.
+        run: terraform init -backend=false -input=false -lockfile=readonly
+
+      - name: terraform validate
+        run: terraform validate

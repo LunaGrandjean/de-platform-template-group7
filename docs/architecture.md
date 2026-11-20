@@ -21,7 +21,14 @@ tables, a synthetic CRUD sequence, connector and sink restart/resume, and
 current slot/WAL status. See [CDC evidence](evidence/step3/cdc-status.json).
 The orders catch-up advanced its cursor to 225405; two rows were already above
 that watermark at its post-run check. Step 4 has deployed external Bronze tables and native monthly-partitioned
-sales tables. Silver and Gold remain planned for Lesson 5.
+sales tables. Step 5 built Silver and Gold with dbt ([ADR 0005](adr/0005-materialisations.md)),
+Step 6 packaged the jobs as images and Step 7 runs them daily in Airflow.
+Step 8 declares the Bronze bucket and the four `g07_*` datasets, with their
+named grants, in Terraform (`infra/terraform/`), adopted with import blocks
+rather than recreated; state lives in a versioned GCS bucket
+([infra.md](infra.md), [ADR 0008](adr/0008-remote-state.md)). Terraform owns the
+datasets and who can reach them, not the tables inside: those stay with the
+code that writes them (Step 4 SQL, dbt, the Step 7 external-table macro).
 
 ## Context and target diagram
 
@@ -54,14 +61,25 @@ flowchart LR
         cdc_sink[Python raw CDC Kafka consumer]
     end
 
+    subgraph iac[Step 8 - Terraform: infra/terraform]
+        tf[Terraform 1.17 + google 8.9.0 - 17 resources adopted, plan: No changes on 2026-11-08]
+        tfstate[(GCS: data-engineering-i1-g07-tfstate - versioned state)]
+        tf <-->|state + lock| tfstate
+    end
+    tf -.->|bucket + lifecycle| bronze
+    tf -.->|dataset + grants| ext
+    tf -.->|dataset + grants| raw
+    tf -.->|dataset + grants| silver
+    tf -.->|dataset + grants| gold
+
     subgraph gcp[Google Cloud: europe-west1 - Bronze and warehouse deployed]
         bronze[(GCS: data-engineering-i1-marketplace-group)]
         dlq[(GCS bronze/_dlq/: rejected events)]
         ext[(BigQuery g07_bronze: snapshot and selected live external tables)]
         raw[(BigQuery g07_warehouse: native orders and order_lines)]
         mv[(Daily-demand MV: verified 2026-11-06)]
-        silver[(BigQuery Silver: curated records - Lesson 5)]
-        gold[(BigQuery Gold: daily-demand star - Lesson 5)]
+        silver[(BigQuery g07_silver: dbt views - Step 5)]
+        gold[(BigQuery g07_gold: daily-demand star - Step 5)]
     end
 
     csv --> initial
@@ -106,9 +124,10 @@ units.
 | BigQuery external Bronze tables | Seven pinned snapshot tables and Python orders / main clickstream external tables; [evidence](evidence/step4/external-tables-step3.json) | CDC stays raw in GCS until envelope reconciliation is implemented |
 | Native BigQuery working tables | `g07_warehouse.orders` and `order_lines`, monthly partitions; order_lines clustered by product; snapshot only | See [warehouse tuning](warehouse-tuning.md) for measurements, materialisation and cost cap |
 | Daily-demand materialised view | Verified 2026-11-06: `g07_warehouse.daily_demand`; collapse 1.144487?; independent August result equality; capped uncached jobs | Background refresh disabled for the fixed snapshot; repeat validation after a coordinated rebuild |
-| Silver and Gold | Model design only | Lesson 5: implement and test business transformations |
+| Silver and Gold | Step 5: dbt views in `g07_silver`, tables in `g07_gold` ([ADR 0005](adr/0005-materialisations.md)); rebuilt and tested daily by Step 7 | See [orchestration.md](orchestration.md) for the quality gate |
 | Container images | Step 6: `group7-ingestion` and `group7-transform` built and tested locally (non-root, no secrets, pinned at both ends). The ingestion image ran against the local source and wrote the same rows from two fresh volumes. Pushed to Docker Hub as `omara11/group7-*:2026-11-12-90355ad` and reproduced from there: same output, matching digests. Retention policy executed on 2026-11-16. | Step 7 schedules these images by their dated tag; see [ADR 0006](adr/0006-image-tags.md) and [reproduce.md](reproduce.md) |
 | Orchestration | Step 7: Airflow 3.3.2 (lean, `LocalExecutor`) runs `marketplace_daily` daily: `extract_orders` (orders and their lines) to `bronze/scheduled/`, then the external tables, then `dbt build` as a lock. Gold reads the snapshot before 2026-09-15 and the scheduled extract from then on. Back-fill 15 to 21 Sep matched its prediction; the fire drill showed the alarm and the lock. | Teammate review; see [orchestration.md](orchestration.md) and the [runbook](runbooks/failed-run.md) |
+| Infrastructure as code | Step 8: bucket, four `g07_*` datasets and 12 named grants in Terraform, adopted by import on 2026-11-08 (`plan`: No changes); remote state in GCS; drift provoked and detected. The pipeline service account is declared with the grants the Step 7 tasks need, but not created (no permission in the shared project). | Create the service account, move Airflow to it, then narrow the project defaults (Step 10); see [infra.md](infra.md) |
 
 ## Bronze, Silver and Gold contracts
 
@@ -134,6 +153,7 @@ was not read. Silver and Gold remain target contracts.
 | [0005](adr/0005-materialisations.md) | Staging and intermediate as views, marts as tables | Accepted |
 | [0006](adr/0006-image-tags.md) | Date-and-commit image tags, public repositories on Docker Hub | Accepted: retention executed 2026-11-16 |
 | [0007](adr/0007-idempotency.md) | Reruns safe by design: new Bronze load per run (newest wins in silver), CREATE OR REPLACE elsewhere | Accepted |
+| [0008](adr/0008-remote-state.md) | Terraform state in a versioned GCS bucket | Accepted |
 
 ## Bronze paths
 

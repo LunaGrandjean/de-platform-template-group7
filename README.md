@@ -29,7 +29,7 @@ events. The platform targets daily units sold by product and country.
 | Omar Abdellatif | [@abdellatifomar61-ship-it](https://github.com/abdellatifomar61-ship-it) | Step 6 container images (Dockerfiles, Docker Hub tags, reproduction, retention, ADR 0006) and Step 7 Airflow orchestration (DAG, alerts, fire drill, back-fill, runbook, ADR 0007) |
 | Malek Saoudi | [@Msaoudi115](https://github.com/Msaoudi115) | Step 3 live Docker/Debezium deployment and evidence |
 | Anas Mossad | [@realay04](https://github.com/realay04) | To be documented |
-| Emile Gadenne | [@egadenne-ai](https://github.com/egadenne-ai) | Step 4 BigQuery warehouse, costed queries and ADR 0004 |
+| Emile Gadenne | [@egadenne-ai](https://github.com/egadenne-ai) | Step 4 BigQuery warehouse, costed queries and ADR 0004; Step 8 Terraform (adoption by import, remote state, drift, pipeline identity, ADR 0008) |
 
 We are group 7 (`g07`). The cohort identifier has not been provided yet. Add it
 before submitting the group repository.
@@ -264,6 +264,25 @@ external table, then `dbt build`, which stops before the marts when a test fails
 The extractor gained an interval mode for this step
 ([`ingestion/extract_orders.py`](ingestion/extract_orders.py)): it reads the orders of the
 run's period and writes a new, never-overwritten Bronze load per day.
+
+### Step 8: Infrastructure as code
+
+The Bronze bucket, the four `g07_*` datasets and their named grants are declared in
+Terraform and changed only through it. They already existed, so they were adopted with
+import blocks, not recreated; the first plan after adoption said "No changes".
+
+| Deliverable | Content |
+|---|---|
+| [`infra/terraform/`](infra/terraform/) | Terraform 1.17.1, Google provider 8.9.0 pinned with its lock file; 17 adopted resources, `prevent_destroy` on the bucket and datasets |
+| [Infrastructure](docs/infra.md) | How to run it, one line per resource and why it exists, what stays outside Terraform (tables, Docker Hub images), the drift exercise, and the identity the Step 7 pipeline should run as |
+| [ADR 0008](docs/adr/0008-remote-state.md) | State in a versioned GCS bucket of our own, and what to do if it is deleted |
+| [Evidence](docs/evidence/step8/) | Transcripts of the adoption, the provoked drift and the final plans |
+| [CI check](.github/workflows/terraform.yml) | `fmt -check`, `init -backend=false` and `validate` on every PR touching `infra/terraform/`, with no cloud credential |
+
+The pipeline service account is declared with exactly the grants the three DAG tasks need,
+but not created: our accounts cannot create service accounts in the shared project. Until
+the course admin creates it, Airflow runs as a person through the project's default
+bindings ([infra.md](docs/infra.md#the-pipelines-identity-steps-7-and-8)).
 
 ## Start it
 

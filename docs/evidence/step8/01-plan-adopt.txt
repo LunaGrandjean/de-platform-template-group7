@@ -1,0 +1,634 @@
+Acquiring state lock. This may take a few moments...
+google_bigquery_dataset.warehouse: Preparing import... [id=projects/data-engineering-i1/datasets/g07_warehouse]
+google_bigquery_dataset.gold: Preparing import... [id=projects/data-engineering-i1/datasets/g07_gold]
+google_storage_bucket.bronze: Preparing import... [id=data-engineering-i1-marketplace-group]
+google_bigquery_dataset.silver: Preparing import... [id=projects/data-engineering-i1/datasets/g07_silver]
+google_bigquery_dataset.bronze: Preparing import... [id=projects/data-engineering-i1/datasets/g07_bronze]
+google_storage_bucket.bronze: Refreshing state... [id=data-engineering-i1-marketplace-group]
+google_bigquery_dataset.gold: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_gold]
+google_bigquery_dataset.warehouse: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse]
+google_bigquery_dataset.bronze: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze]
+google_bigquery_dataset.silver: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_silver]
+google_bigquery_dataset_iam_member.silver_owner: Preparing import... [id=projects/data-engineering-i1/datasets/g07_silver roles/bigquery.dataOwner user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.gold_owner: Preparing import... [id=projects/data-engineering-i1/datasets/g07_gold roles/bigquery.dataOwner user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_owner: Preparing import... [id=projects/data-engineering-i1/datasets/g07_warehouse roles/bigquery.dataOwner user:egadenne@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:amohamed@albertschool.com"]: Preparing import... [id=projects/data-engineering-i1/datasets/g07_warehouse roles/bigquery.dataEditor user:amohamed@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:msaoudi@albertschool.com"]: Preparing import... [id=projects/data-engineering-i1/datasets/g07_warehouse roles/bigquery.dataEditor user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:lgrandjean@albertschool.com"]: Preparing import... [id=projects/data-engineering-i1/datasets/g07_warehouse roles/bigquery.dataEditor user:lgrandjean@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:oabdellatif@albertschool.com"]: Preparing import... [id=projects/data-engineering-i1/datasets/g07_warehouse roles/bigquery.dataEditor user:oabdellatif@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_owner: Preparing import... [id=projects/data-engineering-i1/datasets/g07_bronze roles/bigquery.dataOwner user:egadenne@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:msaoudi@albertschool.com"]: Preparing import... [id=projects/data-engineering-i1/datasets/g07_bronze roles/bigquery.dataViewer user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.silver_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_silver/roles/bigquery.dataOwner/user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataOwner/user:egadenne@albertschool.com]
+google_bigquery_dataset_iam_member.gold_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_gold/roles/bigquery.dataOwner/user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataOwner/user:egadenne@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:amohamed@albertschool.com"]: Preparing import... [id=projects/data-engineering-i1/datasets/g07_bronze roles/bigquery.dataViewer user:amohamed@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:oabdellatif@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:oabdellatif@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:msaoudi@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:oabdellatif@albertschool.com"]: Preparing import... [id=projects/data-engineering-i1/datasets/g07_bronze roles/bigquery.dataViewer user:oabdellatif@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:lgrandjean@albertschool.com"]: Preparing import... [id=projects/data-engineering-i1/datasets/g07_bronze roles/bigquery.dataViewer user:lgrandjean@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:msaoudi@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:msaoudi@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:amohamed@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:amohamed@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:lgrandjean@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:lgrandjean@albertschool.com]
+google_bigquery_dataset_iam_member.warehouse_writers["user:amohamed@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:amohamed@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:lgrandjean@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:lgrandjean@albertschool.com]
+google_bigquery_dataset_iam_member.bronze_readers["user:oabdellatif@albertschool.com"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:oabdellatif@albertschool.com]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  ~ update in-place
+
+Terraform will perform the following actions:
+
+  # google_bigquery_dataset.bronze will be updated in-place
+  # (imported from "projects/data-engineering-i1/datasets/g07_bronze")
+  ~ resource "google_bigquery_dataset" "bronze" {
+        creation_time                   = 1793884988523
+        dataset_id                      = "g07_bronze"
+        default_collation               = null
+        default_partition_expiration_ms = 0
+        default_table_expiration_ms     = 0
+        delete_contents_on_destroy      = false
+        deletion_policy                 = "DELETE"
+        description                     = "Group 7: external tables over the Bronze Parquet snapshot in GCS"
+        effective_labels                = {
+            "group" = "g07"
+            "layer" = "bronze"
+            "step"  = "l04"
+        }
+        etag                            = "zofOVrVREwyu6gnakxLsYw=="
+        friendly_name                   = null
+        id                              = "projects/data-engineering-i1/datasets/g07_bronze"
+        is_case_insensitive             = false
+      ~ labels                          = {
+          + "group" = "g07"
+          + "layer" = "bronze"
+          + "step"  = "l04"
+        }
+        last_modified_time              = 1793960999808
+        location                        = "europe-west1"
+        max_time_travel_hours           = "168"
+        project                         = "data-engineering-i1"
+        resource_tags                   = {}
+        self_link                       = "https://bigquery.googleapis.com/bigquery/v2/projects/data-engineering-i1/datasets/g07_bronze"
+        storage_billing_model           = null
+      ~ terraform_labels                = {
+          + "group" = "g07"
+          + "layer" = "bronze"
+          + "step"  = "l04"
+        }
+
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "OWNER"
+            special_group  = null
+            user_by_email  = "egadenne@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "OWNER"
+            special_group  = "projectOwners"
+            user_by_email  = null
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "READER"
+            special_group  = null
+            user_by_email  = "amohamed@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "READER"
+            special_group  = null
+            user_by_email  = "lgrandjean@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "READER"
+            special_group  = null
+            user_by_email  = "msaoudi@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "READER"
+            special_group  = null
+            user_by_email  = "oabdellatif@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "READER"
+            special_group  = "projectReaders"
+            user_by_email  = null
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "WRITER"
+            special_group  = "projectWriters"
+            user_by_email  = null
+        }
+    }
+
+  # google_bigquery_dataset.gold will be imported
+    resource "google_bigquery_dataset" "gold" {
+        creation_time                   = 1794001746542
+        dataset_id                      = "g07_gold"
+        default_collation               = null
+        default_partition_expiration_ms = 0
+        default_table_expiration_ms     = 0
+        delete_contents_on_destroy      = false
+        deletion_policy                 = "DELETE"
+        description                     = null
+        effective_labels                = {}
+        etag                            = "R4ts0b3HuF8lZQshFvt64Q=="
+        friendly_name                   = null
+        id                              = "projects/data-engineering-i1/datasets/g07_gold"
+        is_case_insensitive             = false
+        labels                          = {}
+        last_modified_time              = 1794001746542
+        location                        = "europe-west1"
+        max_time_travel_hours           = "168"
+        project                         = "data-engineering-i1"
+        resource_tags                   = {}
+        self_link                       = "https://bigquery.googleapis.com/bigquery/v2/projects/data-engineering-i1/datasets/g07_gold"
+        storage_billing_model           = null
+        terraform_labels                = {}
+
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "OWNER"
+            special_group  = null
+            user_by_email  = "msaoudi@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "OWNER"
+            special_group  = "projectOwners"
+            user_by_email  = null
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "READER"
+            special_group  = "projectReaders"
+            user_by_email  = null
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "WRITER"
+            special_group  = "projectWriters"
+            user_by_email  = null
+        }
+    }
+
+  # google_bigquery_dataset.silver will be imported
+    resource "google_bigquery_dataset" "silver" {
+        creation_time                   = 1794001354033
+        dataset_id                      = "g07_silver"
+        default_collation               = null
+        default_partition_expiration_ms = 0
+        default_table_expiration_ms     = 0
+        delete_contents_on_destroy      = false
+        deletion_policy                 = "DELETE"
+        description                     = null
+        effective_labels                = {}
+        etag                            = "ZU1XfErn0LmnMDRXBC/ugQ=="
+        friendly_name                   = null
+        id                              = "projects/data-engineering-i1/datasets/g07_silver"
+        is_case_insensitive             = false
+        labels                          = {}
+        last_modified_time              = 1794001354033
+        location                        = "europe-west1"
+        max_time_travel_hours           = "168"
+        project                         = "data-engineering-i1"
+        resource_tags                   = {}
+        self_link                       = "https://bigquery.googleapis.com/bigquery/v2/projects/data-engineering-i1/datasets/g07_silver"
+        storage_billing_model           = null
+        terraform_labels                = {}
+
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "OWNER"
+            special_group  = null
+            user_by_email  = "msaoudi@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "OWNER"
+            special_group  = "projectOwners"
+            user_by_email  = null
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "READER"
+            special_group  = "projectReaders"
+            user_by_email  = null
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "WRITER"
+            special_group  = "projectWriters"
+            user_by_email  = null
+        }
+    }
+
+  # google_bigquery_dataset.warehouse will be updated in-place
+  # (imported from "projects/data-engineering-i1/datasets/g07_warehouse")
+  ~ resource "google_bigquery_dataset" "warehouse" {
+        creation_time                   = 1793885102450
+        dataset_id                      = "g07_warehouse"
+        default_collation               = null
+        default_partition_expiration_ms = 0
+        default_table_expiration_ms     = 0
+        delete_contents_on_destroy      = false
+        deletion_policy                 = "DELETE"
+        description                     = "Group 7: native typed working tables loaded from Bronze (Step 4)"
+        effective_labels                = {
+            "group" = "g07"
+            "layer" = "warehouse"
+            "step"  = "l04"
+        }
+        etag                            = "HdOvTRruVVjvq2CVsQTJUw=="
+        friendly_name                   = null
+        id                              = "projects/data-engineering-i1/datasets/g07_warehouse"
+        is_case_insensitive             = false
+      ~ labels                          = {
+          + "group" = "g07"
+          + "layer" = "warehouse"
+          + "step"  = "l04"
+        }
+        last_modified_time              = 1793961001108
+        location                        = "europe-west1"
+        max_time_travel_hours           = "168"
+        project                         = "data-engineering-i1"
+        resource_tags                   = {}
+        self_link                       = "https://bigquery.googleapis.com/bigquery/v2/projects/data-engineering-i1/datasets/g07_warehouse"
+        storage_billing_model           = null
+      ~ terraform_labels                = {
+          + "group" = "g07"
+          + "layer" = "warehouse"
+          + "step"  = "l04"
+        }
+
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "OWNER"
+            special_group  = null
+            user_by_email  = "egadenne@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "OWNER"
+            special_group  = "projectOwners"
+            user_by_email  = null
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "READER"
+            special_group  = "projectReaders"
+            user_by_email  = null
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "WRITER"
+            special_group  = null
+            user_by_email  = "amohamed@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "WRITER"
+            special_group  = null
+            user_by_email  = "lgrandjean@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "WRITER"
+            special_group  = null
+            user_by_email  = "msaoudi@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "WRITER"
+            special_group  = null
+            user_by_email  = "oabdellatif@albertschool.com"
+        }
+        access {
+            domain         = null
+            group_by_email = null
+            iam_member     = null
+            role           = "WRITER"
+            special_group  = "projectWriters"
+            user_by_email  = null
+        }
+    }
+
+  # google_bigquery_dataset_iam_member.bronze_owner will be imported
+    resource "google_bigquery_dataset_iam_member" "bronze_owner" {
+        dataset_id = "g07_bronze"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataOwner/user:egadenne@albertschool.com"
+        member     = "user:egadenne@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataOwner"
+    }
+
+  # google_bigquery_dataset_iam_member.bronze_readers["user:amohamed@albertschool.com"] will be imported
+    resource "google_bigquery_dataset_iam_member" "bronze_readers" {
+        dataset_id = "g07_bronze"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:amohamed@albertschool.com"
+        member     = "user:amohamed@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataViewer"
+    }
+
+  # google_bigquery_dataset_iam_member.bronze_readers["user:lgrandjean@albertschool.com"] will be imported
+    resource "google_bigquery_dataset_iam_member" "bronze_readers" {
+        dataset_id = "g07_bronze"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:lgrandjean@albertschool.com"
+        member     = "user:lgrandjean@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataViewer"
+    }
+
+  # google_bigquery_dataset_iam_member.bronze_readers["user:msaoudi@albertschool.com"] will be imported
+    resource "google_bigquery_dataset_iam_member" "bronze_readers" {
+        dataset_id = "g07_bronze"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:msaoudi@albertschool.com"
+        member     = "user:msaoudi@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataViewer"
+    }
+
+  # google_bigquery_dataset_iam_member.bronze_readers["user:oabdellatif@albertschool.com"] will be imported
+    resource "google_bigquery_dataset_iam_member" "bronze_readers" {
+        dataset_id = "g07_bronze"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:oabdellatif@albertschool.com"
+        member     = "user:oabdellatif@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataViewer"
+    }
+
+  # google_bigquery_dataset_iam_member.gold_owner will be imported
+    resource "google_bigquery_dataset_iam_member" "gold_owner" {
+        dataset_id = "g07_gold"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_gold/roles/bigquery.dataOwner/user:msaoudi@albertschool.com"
+        member     = "user:msaoudi@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataOwner"
+    }
+
+  # google_bigquery_dataset_iam_member.silver_owner will be imported
+    resource "google_bigquery_dataset_iam_member" "silver_owner" {
+        dataset_id = "g07_silver"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_silver/roles/bigquery.dataOwner/user:msaoudi@albertschool.com"
+        member     = "user:msaoudi@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataOwner"
+    }
+
+  # google_bigquery_dataset_iam_member.warehouse_owner will be imported
+    resource "google_bigquery_dataset_iam_member" "warehouse_owner" {
+        dataset_id = "g07_warehouse"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataOwner/user:egadenne@albertschool.com"
+        member     = "user:egadenne@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataOwner"
+    }
+
+  # google_bigquery_dataset_iam_member.warehouse_writers["user:amohamed@albertschool.com"] will be imported
+    resource "google_bigquery_dataset_iam_member" "warehouse_writers" {
+        dataset_id = "g07_warehouse"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:amohamed@albertschool.com"
+        member     = "user:amohamed@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataEditor"
+    }
+
+  # google_bigquery_dataset_iam_member.warehouse_writers["user:lgrandjean@albertschool.com"] will be imported
+    resource "google_bigquery_dataset_iam_member" "warehouse_writers" {
+        dataset_id = "g07_warehouse"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:lgrandjean@albertschool.com"
+        member     = "user:lgrandjean@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataEditor"
+    }
+
+  # google_bigquery_dataset_iam_member.warehouse_writers["user:msaoudi@albertschool.com"] will be imported
+    resource "google_bigquery_dataset_iam_member" "warehouse_writers" {
+        dataset_id = "g07_warehouse"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:msaoudi@albertschool.com"
+        member     = "user:msaoudi@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataEditor"
+    }
+
+  # google_bigquery_dataset_iam_member.warehouse_writers["user:oabdellatif@albertschool.com"] will be imported
+    resource "google_bigquery_dataset_iam_member" "warehouse_writers" {
+        dataset_id = "g07_warehouse"
+        etag       = null
+        id         = "projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:oabdellatif@albertschool.com"
+        member     = "user:oabdellatif@albertschool.com"
+        project    = "data-engineering-i1"
+        role       = "roles/bigquery.dataEditor"
+    }
+
+  # google_storage_bucket.bronze will be updated in-place
+  # (imported from "data-engineering-i1-marketplace-group")
+  ~ resource "google_storage_bucket" "bronze" {
+        default_event_based_hold    = false
+        deletion_policy             = "DELETE"
+        effective_labels            = {
+            "application" = "albert-marketplace"
+            "layer"       = "bronze"
+            "managed-by"  = "python"
+        }
+        enable_object_retention     = false
+        force_destroy               = false
+        id                          = "data-engineering-i1-marketplace-group"
+      ~ labels                      = {
+          + "application" = "albert-marketplace"
+          + "layer"       = "bronze"
+          + "managed-by"  = "python"
+        }
+        location                    = "EUROPE-WEST1"
+        name                        = "data-engineering-i1-marketplace-group"
+        project                     = "data-engineering-i1"
+        project_number              = 671557693556
+        public_access_prevention    = "enforced"
+        requester_pays              = false
+        self_link                   = "https://www.googleapis.com/storage/v1/b/data-engineering-i1-marketplace-group"
+        storage_class               = "STANDARD"
+      ~ terraform_labels            = {
+          + "application" = "albert-marketplace"
+          + "layer"       = "bronze"
+          + "managed-by"  = "python"
+        }
+        time_created                = "2026-10-26T10:52:25.001Z"
+        uniform_bucket_level_access = true
+        updated                     = "2026-10-26T10:52:25.001Z"
+        url                         = "gs://data-engineering-i1-marketplace-group"
+
+        hierarchical_namespace {
+            enabled = false
+        }
+
+        lifecycle_rule {
+            action {
+                storage_class = "NEARLINE"
+                type          = "SetStorageClass"
+            }
+            condition {
+                age                                     = 30
+                created_before                          = null
+                custom_time_before                      = null
+                days_since_custom_time                  = 0
+                days_since_noncurrent_time              = 0
+                matches_prefix                          = [
+                    "bronze/",
+                ]
+                matches_storage_class                   = [
+                    "STANDARD",
+                ]
+                matches_suffix                          = []
+                noncurrent_time_before                  = null
+                num_newer_versions                      = 0
+                send_age_if_zero                        = false
+                send_days_since_custom_time_if_zero     = false
+                send_days_since_noncurrent_time_if_zero = false
+                send_num_newer_versions_if_zero         = false
+                size_above_bytes                        = 0
+                size_below_bytes                        = 0
+                with_state                              = "ANY"
+            }
+        }
+        lifecycle_rule {
+            action {
+                storage_class = "COLDLINE"
+                type          = "SetStorageClass"
+            }
+            condition {
+                age                                     = 90
+                created_before                          = null
+                custom_time_before                      = null
+                days_since_custom_time                  = 0
+                days_since_noncurrent_time              = 0
+                matches_prefix                          = [
+                    "bronze/",
+                ]
+                matches_storage_class                   = [
+                    "STANDARD",
+                    "NEARLINE",
+                ]
+                matches_suffix                          = []
+                noncurrent_time_before                  = null
+                num_newer_versions                      = 0
+                send_age_if_zero                        = false
+                send_days_since_custom_time_if_zero     = false
+                send_days_since_noncurrent_time_if_zero = false
+                send_num_newer_versions_if_zero         = false
+                size_above_bytes                        = 0
+                size_below_bytes                        = 0
+                with_state                              = "ANY"
+            }
+        }
+        lifecycle_rule {
+            action {
+                storage_class = "ARCHIVE"
+                type          = "SetStorageClass"
+            }
+            condition {
+                age                                     = 365
+                created_before                          = null
+                custom_time_before                      = null
+                days_since_custom_time                  = 0
+                days_since_noncurrent_time              = 0
+                matches_prefix                          = [
+                    "bronze/",
+                ]
+                matches_storage_class                   = [
+                    "STANDARD",
+                    "NEARLINE",
+                    "COLDLINE",
+                ]
+                matches_suffix                          = []
+                noncurrent_time_before                  = null
+                num_newer_versions                      = 0
+                send_age_if_zero                        = false
+                send_days_since_custom_time_if_zero     = false
+                send_days_since_noncurrent_time_if_zero = false
+                send_num_newer_versions_if_zero         = false
+                size_above_bytes                        = 0
+                size_below_bytes                        = 0
+                with_state                              = "ANY"
+            }
+        }
+
+        soft_delete_policy {
+            effective_time             = "2026-10-26T10:52:25.001Z"
+            retention_duration_seconds = 604800
+        }
+    }
+
+Plan: 17 to import, 0 to add, 3 to change, 0 to destroy.
+
+─────────────────────────────────────────────────────────────────────────────
+
+Saved the plan to: adopt.tfplan
+
+To perform exactly these actions, run the following command to apply:
+    terraform apply "adopt.tfplan"
+Releasing state lock. This may take a few moments...
