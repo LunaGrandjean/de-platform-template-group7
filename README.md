@@ -303,6 +303,17 @@ out of seven brought it to 772 MiB (-36.5%), measured on 2026-11-19 with gold un
 | [ADR 0009](docs/adr/0009-cost-attribution.md) | Labels on resources and jobs over a project per team, tags or a manual split, and what changes at ten teams |
 | [Evidence](docs/evidence/step9/) | Daily bytes, the 11-17 build job by job, storage inventory, prices, label check, selections and the label-only `terraform plan` |
 
+**Delivery.** Commit `3bb044f` on `anas/step9-finops`, rebased on `main` after PR #6
+(Step 8), reviewed in [PR #9](https://github.com/LunaGrandjean/de-platform-template-group7/pull/9).
+Checked before opening: `tests/test_warehouse.py` 12 passed, `dbt ls` 103 nodes in
+`full` and 57 in `daily`, `terraform validate` OK. Still open, and why each one blocks:
+
+| Open item | Owner | Blocks |
+|---|---|---|
+| Transform image with `selectors.yml`, and `TRANSFORM_IMAGE` bumped in the DAG | Omar | Merging: the DAG passes `--selector`, and the current image `2026-11-17-e8df6e5` has no `selectors.yml` |
+| `terraform apply` of the labels (plan: 0 add, 5 change, 0 destroy) | Emile | Labels on the bucket and datasets; needs Terraform 1.17 and the team's go-ahead |
+| Billing account ID and project number | Course admin | Creating the budget (`count = 0` until then) |
+
 ## Start it
 
 You need Docker Desktop (or Docker Engine with Compose v2), about 6 GB of free
