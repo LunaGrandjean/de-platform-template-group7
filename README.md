@@ -333,9 +333,9 @@ are written down, not hidden:
 | [Access matrix](docs/governance.md#2-access-matrix) | Engineer, analyst, pipeline and course admin against six classes, with a route for every "no" |
 | [Hardening](docs/governance.md#4-hardening-what-we-changed) | Taxonomy and tags ([`governance.tf`](infra/terraform/governance.tf)), tags applied by [dbt](transform/models/marts/marts.yml) and [`warehouse.py`](scripts/warehouse.py), the narrowed warehouse grant ([`iam.tf`](infra/terraform/iam.tf)) |
 | [Gaps](docs/governance.md#5-where-the-matrix-and-reality-differ) | Seven, worst first, each with what would close it |
-| [Erasure runbook](docs/runbooks/erasure.md) | Finding a buyer in every layer, the Bronze rewrite, the rebuilds, the copies that survive for 14 days, and the proof. **Not yet run**: the group decides which buyer |
+| [Erasure runbook](docs/runbooks/erasure.md) | Finding a buyer in every layer, the Bronze rewrite, the rebuilds, the copies that survive for 14 days, and the proof. **Run once on 2026-11-21**: one real buyer erased from 6 Bronze files, silver and gold, dbt 102 of 103 passing, and two runbook bugs found and fixed |
 | [ADR 0010](docs/adr/0010-data-classification.md) | Classification over a view per consumer, a dataset per sensitivity level, or trust, and why it is the only one that survives access we cannot remove |
-| [Evidence](docs/evidence/step10/) | Column inventory, 30 days of readers, access before, the Bronze refusal, read checks, reader grants, tags and labels after, the audit-log check |
+| [Evidence](docs/evidence/step10/) | Column inventory, 30 days of readers, access before, the Bronze refusal, read checks, reader grants, tags and labels after, the audit-log check, the erasure test |
 
 ## Start it
 
