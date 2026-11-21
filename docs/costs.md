@@ -139,8 +139,10 @@ have attributed the small lines and left the big one blank.
 
 **What carries no label, and why:**
 
-- The 12 dataset IAM bindings and the (uncreated) service account: these
-  resource types take no labels in GCP, and cost nothing.
+- The 12 dataset IAM bindings, the (uncreated) `g07-pipeline` service account
+  and its bindings (Bronze object user, bucket metadata reader, editor on all four
+  datasets; `service_account.tf`, all `count = 0` today): these resource
+  types take no labels in GCP, and cost nothing.
 - The Terraform state bucket: outside Terraform on purpose (ADR 0008). It was
   labelled by hand on 2026-11-08 with an older set (`group`, `layer`, `lesson`,
   `managed-by`). 37.6 KB, effectively free.
@@ -329,7 +331,7 @@ measured 2026-11-19. Prices read 2026-11-19, except Cloud Storage operations
 | BigQuery queries, all `g07_*` jobs | GiB billed, 10 MB minimum per table referenced | 1,215 MiB per scheduled build before; 772 MiB after (measured 2026-11-19) | $7.50/TiB, first TiB free (2026-11-19) | $0.26/month before, $0.18 after |
 | `gs://data-engineering-i1-g07-tfstate` (outside Terraform) | GiB stored, including noncurrent versions | 37.6 KB live object | $0.02/GiB-month (2026-11-19) | ~$0 |
 | 12 dataset IAM bindings | Nothing | - | free | $0 |
-| `g07-pipeline` service account (not created) | Nothing | - | free | $0 |
+| `g07-pipeline` service account and its 2 bucket and 4 dataset bindings (not created) | Nothing | - | free | $0 |
 | Budget and its email channel (not created) | Nothing | - | free | $0 |
 | **Total** | | | | **~$0.27/month at list, 0.00 invoiced** |
 
