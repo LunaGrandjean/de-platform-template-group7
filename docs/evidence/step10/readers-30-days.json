@@ -1,0 +1,851 @@
+{
+ "source": "region-europe-west1 INFORMATION_SCHEMA.JOBS, referenced_tables, 30 days to 2026-11-20; emails reduced to roles",
+ "rows": [
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.INFORMATION_SCHEMA.COLUMNS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-20 18:11",
+   "last": "2026-11-20 18:11",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.INFORMATION_SCHEMA.COLUMNS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.INFORMATION_SCHEMA.MATERIALIZED_VIEWS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.INFORMATION_SCHEMA.TABLES",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-20 18:11",
+   "last": "2026-11-20 18:11",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.INFORMATION_SCHEMA.TABLE_OPTIONS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.__TABLES__",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-19 22:27",
+   "last": "2026-11-19 22:27",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.__TABLES__",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.customer_shipping",
+   "jobs": 4,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_bronze.customer_shipping",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-05 13:23",
+   "last": "2026-11-05 13:23",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.customer_shipping",
+   "jobs": 67,
+   "failed": 0,
+   "first": "2026-11-06 21:38",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.customer_shipping",
+   "jobs": 191,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:50",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.kafka_clickstream",
+   "jobs": 5,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_bronze.kafka_clickstream",
+   "jobs": 3,
+   "failed": 1,
+   "first": "2026-11-05 19:34",
+   "last": "2026-11-05 19:34",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.kafka_clickstream",
+   "jobs": 33,
+   "failed": 1,
+   "first": "2026-11-06 21:32",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.kafka_clickstream",
+   "jobs": 77,
+   "failed": 0,
+   "first": "2026-11-12 13:18",
+   "last": "2026-11-17 16:50",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.order_items",
+   "jobs": 9,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_bronze.order_items",
+   "jobs": 5,
+   "failed": 0,
+   "first": "2026-11-05 13:23",
+   "last": "2026-11-05 13:26",
+   "via_dbt": false
+  },
+  {
+   "who": "member:luna",
+   "table": "g07_bronze.order_items",
+   "jobs": 10,
+   "failed": 0,
+   "first": "2026-11-06 10:40",
+   "last": "2026-11-06 10:45",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.order_items",
+   "jobs": 83,
+   "failed": 0,
+   "first": "2026-11-06 21:25",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.order_items",
+   "jobs": 246,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:51",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.orders",
+   "jobs": 9,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_bronze.orders",
+   "jobs": 8,
+   "failed": 0,
+   "first": "2026-11-05 13:23",
+   "last": "2026-11-05 19:34",
+   "via_dbt": false
+  },
+  {
+   "who": "member:luna",
+   "table": "g07_bronze.orders",
+   "jobs": 13,
+   "failed": 0,
+   "first": "2026-11-06 10:40",
+   "last": "2026-11-06 10:45",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.orders",
+   "jobs": 85,
+   "failed": 4,
+   "first": "2026-11-06 21:24",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.orders",
+   "jobs": 251,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:51",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.product",
+   "jobs": 3,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_bronze.product",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-05 13:23",
+   "last": "2026-11-05 13:23",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.product",
+   "jobs": 37,
+   "failed": 2,
+   "first": "2026-11-06 21:24",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.product",
+   "jobs": 94,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:50",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.product_reviews",
+   "jobs": 4,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_bronze.product_reviews",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-05 13:23",
+   "last": "2026-11-05 13:23",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.product_reviews",
+   "jobs": 43,
+   "failed": 0,
+   "first": "2026-11-06 21:38",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.product_reviews",
+   "jobs": 136,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:50",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.python_orders",
+   "jobs": 4,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_bronze.python_orders",
+   "jobs": 2,
+   "failed": 0,
+   "first": "2026-11-05 19:34",
+   "last": "2026-11-05 19:34",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.python_orders",
+   "jobs": 24,
+   "failed": 1,
+   "first": "2026-11-06 21:32",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.python_orders",
+   "jobs": 58,
+   "failed": 0,
+   "first": "2026-11-12 13:18",
+   "last": "2026-11-17 16:50",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.review",
+   "jobs": 4,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_bronze.review",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-05 13:23",
+   "last": "2026-11-05 13:23",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.review",
+   "jobs": 55,
+   "failed": 0,
+   "first": "2026-11-06 21:38",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.review",
+   "jobs": 174,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:50",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.scheduled_order_items",
+   "jobs": 16,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.scheduled_order_items",
+   "jobs": 52,
+   "failed": 0,
+   "first": "2026-11-17 16:28",
+   "last": "2026-11-17 16:51",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.scheduled_orders",
+   "jobs": 21,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.scheduled_orders",
+   "jobs": 140,
+   "failed": 0,
+   "first": "2026-11-16 11:59",
+   "last": "2026-11-17 16:51",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_bronze.shipping_details",
+   "jobs": 6,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_bronze.shipping_details",
+   "jobs": 2,
+   "failed": 0,
+   "first": "2026-11-05 13:23",
+   "last": "2026-11-05 13:23",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_bronze.shipping_details",
+   "jobs": 70,
+   "failed": 0,
+   "first": "2026-11-06 21:38",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_bronze.shipping_details",
+   "jobs": 214,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:50",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_gold.INFORMATION_SCHEMA.COLUMNS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-20 18:11",
+   "last": "2026-11-20 18:11",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.INFORMATION_SCHEMA.COLUMNS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.INFORMATION_SCHEMA.MATERIALIZED_VIEWS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_gold.INFORMATION_SCHEMA.TABLES",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-20 18:11",
+   "last": "2026-11-20 18:11",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.INFORMATION_SCHEMA.TABLE_OPTIONS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_gold.__TABLES__",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-19 22:27",
+   "last": "2026-11-19 22:27",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.__TABLES__",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_gold.__TABLES__",
+   "jobs": 1,
+   "failed": 1,
+   "first": "2026-11-17 16:34",
+   "last": "2026-11-17 16:34",
+   "via_dbt": false
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_gold.dim_country",
+   "jobs": 4,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:56",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.dim_country",
+   "jobs": 20,
+   "failed": 0,
+   "first": "2026-11-06 21:52",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_gold.dim_country",
+   "jobs": 70,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:51",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_gold.dim_date",
+   "jobs": 4,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:56",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.dim_date",
+   "jobs": 22,
+   "failed": 0,
+   "first": "2026-11-06 21:49",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_gold.dim_date",
+   "jobs": 67,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:51",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_gold.dim_product",
+   "jobs": 6,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:56",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.dim_product",
+   "jobs": 32,
+   "failed": 0,
+   "first": "2026-11-06 21:49",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_gold.dim_product",
+   "jobs": 106,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:51",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_gold.fct_daily_demand",
+   "jobs": 10,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:56",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.fct_daily_demand",
+   "jobs": 52,
+   "failed": 0,
+   "first": "2026-11-06 21:49",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_gold.fct_daily_demand",
+   "jobs": 172,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:51",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_gold.fct_order_items",
+   "jobs": 17,
+   "failed": 0,
+   "first": "2026-11-19 22:56",
+   "last": "2026-11-19 22:58",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_gold.fct_order_items",
+   "jobs": 68,
+   "failed": 0,
+   "first": "2026-11-06 21:49",
+   "last": "2026-11-06 22:13",
+   "via_dbt": true
+  },
+  {
+   "who": "member:omar",
+   "table": "g07_gold.fct_order_items",
+   "jobs": 243,
+   "failed": 0,
+   "first": "2026-11-12 15:49",
+   "last": "2026-11-17 16:51",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_silver.INFORMATION_SCHEMA.COLUMNS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-20 18:11",
+   "last": "2026-11-20 18:11",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_silver.INFORMATION_SCHEMA.COLUMNS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_silver.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_silver.INFORMATION_SCHEMA.MATERIALIZED_VIEWS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_silver.INFORMATION_SCHEMA.TABLES",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-20 18:11",
+   "last": "2026-11-20 18:11",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_silver.INFORMATION_SCHEMA.TABLE_OPTIONS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_silver.__TABLES__",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-19 22:27",
+   "last": "2026-11-19 22:27",
+   "via_dbt": false
+  },
+  {
+   "who": "member:malek",
+   "table": "g07_silver.__TABLES__",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-06 22:03",
+   "last": "2026-11-06 22:03",
+   "via_dbt": true
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_warehouse.INFORMATION_SCHEMA.COLUMNS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-20 18:11",
+   "last": "2026-11-20 18:11",
+   "via_dbt": false
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_warehouse.INFORMATION_SCHEMA.PARTITIONS",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-05 13:25",
+   "last": "2026-11-05 13:25",
+   "via_dbt": false
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_warehouse.INFORMATION_SCHEMA.TABLES",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-20 18:11",
+   "last": "2026-11-20 18:11",
+   "via_dbt": false
+  },
+  {
+   "who": "member:anas",
+   "table": "g07_warehouse.__TABLES__",
+   "jobs": 1,
+   "failed": 0,
+   "first": "2026-11-19 22:27",
+   "last": "2026-11-19 22:27",
+   "via_dbt": false
+  },
+  {
+   "who": "member:luna",
+   "table": "g07_warehouse._step4_unclustered_26cb71acc259",
+   "jobs": 3,
+   "failed": 0,
+   "first": "2026-11-06 10:41",
+   "last": "2026-11-06 10:41",
+   "via_dbt": false
+  },
+  {
+   "who": "member:luna",
+   "table": "g07_warehouse._step4_unclustered_77ef9f6abddb",
+   "jobs": 3,
+   "failed": 0,
+   "first": "2026-11-06 10:45",
+   "last": "2026-11-06 10:45",
+   "via_dbt": false
+  },
+  {
+   "who": "member:luna",
+   "table": "g07_warehouse._step4_unclustered_b4631e4a4e2e",
+   "jobs": 3,
+   "failed": 0,
+   "first": "2026-11-06 10:42",
+   "last": "2026-11-06 10:42",
+   "via_dbt": false
+  },
+  {
+   "who": "member:luna",
+   "table": "g07_warehouse.daily_demand",
+   "jobs": 20,
+   "failed": 2,
+   "first": "2026-11-06 10:41",
+   "last": "2026-11-06 10:45",
+   "via_dbt": false
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_warehouse.order_lines",
+   "jobs": 4,
+   "failed": 0,
+   "first": "2026-11-05 13:26",
+   "last": "2026-11-05 13:26",
+   "via_dbt": false
+  },
+  {
+   "who": "member:luna",
+   "table": "g07_warehouse.order_lines",
+   "jobs": 44,
+   "failed": 5,
+   "first": "2026-11-06 10:40",
+   "last": "2026-11-06 10:45",
+   "via_dbt": false
+  },
+  {
+   "who": "member:emile",
+   "table": "g07_warehouse.orders",
+   "jobs": 3,
+   "failed": 1,
+   "first": "2026-11-05 13:25",
+   "last": "2026-11-05 13:26",
+   "via_dbt": false
+  },
+  {
+   "who": "member:luna",
+   "table": "g07_warehouse.orders",
+   "jobs": 6,
+   "failed": 0,
+   "first": "2026-11-06 10:41",
+   "last": "2026-11-06 10:45",
+   "via_dbt": false
+  }
+ ]
+}

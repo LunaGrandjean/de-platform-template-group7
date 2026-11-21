@@ -1,0 +1,379 @@
+{
+ "source": "INFORMATION_SCHEMA.COLUMNS of the four g07 datasets, 2026-11-20",
+ "datasets": {
+  "g07_bronze": {
+   "customer_shipping": {
+    "type": "EXTERNAL",
+    "cols": [
+     "address_id:STRING",
+     "c_id:STRING",
+     "is_default:STRING"
+    ]
+   },
+   "kafka_clickstream": {
+    "type": "EXTERNAL",
+    "cols": [
+     "schema_version:INT64",
+     "event_id:STRING",
+     "event_type:STRING",
+     "event_time:STRING",
+     "emitted_at:STRING",
+     "buyer_id:STRING",
+     "session_id:STRING",
+     "raw_value:BYTES",
+     "_kafka_topic:STRING",
+     "_kafka_partition:INT64",
+     "_kafka_offset:INT64",
+     "_kafka_key:BYTES",
+     "_kafka_timestamp_ms:INT64",
+     "_ingested_at:STRING",
+     "event_date:DATE"
+    ]
+   },
+   "order_items": {
+    "type": "EXTERNAL",
+    "cols": [
+     "order_id:STRING",
+     "p_id:STRING",
+     "qty:STRING",
+     "price_at_purchase:STRING"
+    ]
+   },
+   "orders": {
+    "type": "EXTERNAL",
+    "cols": [
+     "order_id:STRING",
+     "buyer_id:STRING",
+     "discount_id:STRING",
+     "payment_id:STRING",
+     "order_date:STRING"
+    ]
+   },
+   "product": {
+    "type": "EXTERNAL",
+    "cols": [
+     "p_id:STRING",
+     "p_name:STRING",
+     "p_desc:STRING",
+     "price:STRING",
+     "qty:STRING",
+     "category_id:STRING"
+    ]
+   },
+   "product_reviews": {
+    "type": "EXTERNAL",
+    "cols": [
+     "p_id:STRING",
+     "review_id:STRING"
+    ]
+   },
+   "python_orders": {
+    "type": "EXTERNAL",
+    "cols": [
+     "order_id:INT64",
+     "buyer_id:STRING",
+     "discount_id:INT64",
+     "payment_id:INT64",
+     "order_date:DATE",
+     "ingestion_date:DATE"
+    ]
+   },
+   "review": {
+    "type": "EXTERNAL",
+    "cols": [
+     "review_id:STRING",
+     "buyer_id:STRING",
+     "r_desc:STRING",
+     "title:STRING",
+     "rating:STRING",
+     "seller_product_flag:STRING"
+    ]
+   },
+   "scheduled_order_items": {
+    "type": "EXTERNAL",
+    "cols": [
+     "order_id:INT64",
+     "p_id:STRING",
+     "qty:INT64",
+     "price_at_purchase:NUMERIC",
+     "interval_date:DATE",
+     "load_id:STRING"
+    ]
+   },
+   "scheduled_orders": {
+    "type": "EXTERNAL",
+    "cols": [
+     "order_id:INT64",
+     "buyer_id:STRING",
+     "discount_id:INT64",
+     "payment_id:INT64",
+     "order_date:DATE",
+     "interval_date:DATE",
+     "load_id:STRING"
+    ]
+   },
+   "shipping_details": {
+    "type": "EXTERNAL",
+    "cols": [
+     "address_id:STRING",
+     "street_address:STRING",
+     "city:STRING",
+     "state:STRING",
+     "zip:STRING",
+     "country:STRING",
+     "phone:STRING"
+    ]
+   }
+  },
+  "g07_warehouse": {
+   "daily_demand": {
+    "type": "MATERIALIZED VIEW",
+    "cols": [
+     "order_date:DATE",
+     "p_id:STRING",
+     "units:INT64"
+    ]
+   },
+   "order_lines": {
+    "type": "BASE TABLE",
+    "cols": [
+     "order_id:INT64",
+     "p_id:STRING",
+     "qty:INT64",
+     "price_at_purchase:NUMERIC",
+     "order_date:DATE"
+    ]
+   },
+   "orders": {
+    "type": "BASE TABLE",
+    "cols": [
+     "order_id:INT64",
+     "buyer_id:STRING",
+     "discount_id:INT64",
+     "payment_id:INT64",
+     "order_date:DATE"
+    ]
+   }
+  },
+  "g07_silver": {
+   "int_buyer_country": {
+    "type": "VIEW",
+    "cols": [
+     "customer_id:STRING",
+     "country_code:STRING",
+     "country_name:STRING"
+    ]
+   },
+   "int_order_lines": {
+    "type": "VIEW",
+    "cols": [
+     "order_id:INT64",
+     "p_id:STRING",
+     "order_date:DATE",
+     "buyer_id:STRING",
+     "quantity:INT64",
+     "unit_price_eur:NUMERIC",
+     "is_zero_price:BOOL",
+     "order_origin:STRING"
+    ]
+   },
+   "int_orders_deduplicated": {
+    "type": "VIEW",
+    "cols": [
+     "order_id:INT64",
+     "buyer_id:STRING",
+     "payment_id:INT64",
+     "order_date:DATE"
+    ]
+   },
+   "int_product_review_stats": {
+    "type": "VIEW",
+    "cols": [
+     "p_id:STRING",
+     "review_count:INT64",
+     "rated_review_count:INT64",
+     "avg_rating:FLOAT64"
+    ]
+   },
+   "stg_customer_shipping": {
+    "type": "VIEW",
+    "cols": [
+     "address_id:INT64",
+     "customer_id:STRING",
+     "is_default:BOOL"
+    ]
+   },
+   "stg_kafka_clickstream": {
+    "type": "VIEW",
+    "cols": [
+     "event_id:STRING",
+     "event_type:STRING",
+     "event_at:TIMESTAMP",
+     "emitted_at:TIMESTAMP",
+     "buyer_id:STRING",
+     "session_id:STRING",
+     "ingested_at:TIMESTAMP",
+     "event_date:DATE",
+     "kafka_topic:STRING",
+     "kafka_partition:INT64",
+     "kafka_offset:INT64"
+    ]
+   },
+   "stg_order_items": {
+    "type": "VIEW",
+    "cols": [
+     "order_id:INT64",
+     "p_id:STRING",
+     "quantity:INT64",
+     "unit_price_eur:NUMERIC",
+     "is_zero_price:BOOL"
+    ]
+   },
+   "stg_orders": {
+    "type": "VIEW",
+    "cols": [
+     "order_id:INT64",
+     "buyer_id:STRING",
+     "discount_id:INT64",
+     "payment_id:INT64",
+     "order_date:DATE"
+    ]
+   },
+   "stg_product": {
+    "type": "VIEW",
+    "cols": [
+     "p_id:STRING",
+     "p_name:STRING",
+     "p_desc:STRING",
+     "price_eur:NUMERIC",
+     "stock_qty:INT64",
+     "category_id:INT64"
+    ]
+   },
+   "stg_product_reviews": {
+    "type": "VIEW",
+    "cols": [
+     "p_id:STRING",
+     "review_id:INT64"
+    ]
+   },
+   "stg_python_orders": {
+    "type": "VIEW",
+    "cols": [
+     "order_id:INT64",
+     "buyer_id:STRING",
+     "discount_id:INT64",
+     "payment_id:INT64",
+     "order_date:DATE",
+     "ingestion_date:DATE"
+    ]
+   },
+   "stg_review": {
+    "type": "VIEW",
+    "cols": [
+     "review_id:INT64",
+     "buyer_id:STRING",
+     "review_text:STRING",
+     "title:STRING",
+     "rating:INT64",
+     "seller_product_flag:STRING"
+    ]
+   },
+   "stg_scheduled_order_items": {
+    "type": "VIEW",
+    "cols": [
+     "order_id:INT64",
+     "p_id:STRING",
+     "quantity:INT64",
+     "unit_price_eur:NUMERIC",
+     "is_zero_price:BOOL",
+     "interval_date:DATE",
+     "load_id:STRING"
+    ]
+   },
+   "stg_scheduled_orders": {
+    "type": "VIEW",
+    "cols": [
+     "order_id:INT64",
+     "buyer_id:STRING",
+     "discount_id:INT64",
+     "payment_id:INT64",
+     "order_date:DATE",
+     "interval_date:DATE",
+     "load_id:STRING"
+    ]
+   },
+   "stg_shipping_details": {
+    "type": "VIEW",
+    "cols": [
+     "address_id:INT64",
+     "city:STRING",
+     "region:STRING",
+     "postal_code:STRING",
+     "country_name:STRING",
+     "country_code:STRING"
+    ]
+   }
+  },
+  "g07_gold": {
+   "dim_country": {
+    "type": "BASE TABLE",
+    "cols": [
+     "country_code:STRING",
+     "country_name:STRING"
+    ]
+   },
+   "dim_date": {
+    "type": "BASE TABLE",
+    "cols": [
+     "date_day:DATE",
+     "year:INT64",
+     "month:INT64",
+     "day_of_month:INT64",
+     "iso_week:INT64",
+     "iso_year:INT64",
+     "day_of_week:INT64",
+     "is_weekend:BOOL"
+    ]
+   },
+   "dim_product": {
+    "type": "BASE TABLE",
+    "cols": [
+     "p_id:STRING",
+     "p_name:STRING",
+     "price_eur:NUMERIC",
+     "stock_qty:INT64",
+     "category_id:INT64",
+     "review_count:INT64",
+     "avg_rating:FLOAT64"
+    ]
+   },
+   "fct_daily_demand": {
+    "type": "BASE TABLE",
+    "cols": [
+     "p_id:STRING",
+     "country_code:STRING",
+     "order_date:DATE",
+     "units_sold:INT64",
+     "orders:INT64",
+     "gross_revenue_eur:NUMERIC"
+    ]
+   },
+   "fct_order_items": {
+    "type": "BASE TABLE",
+    "cols": [
+     "order_id:INT64",
+     "p_id:STRING",
+     "order_date:DATE",
+     "buyer_id:STRING",
+     "country_code:STRING",
+     "quantity:INT64",
+     "unit_price_eur:NUMERIC",
+     "gross_amount_eur:NUMERIC",
+     "is_zero_price:BOOL",
+     "order_origin:STRING"
+    ]
+   }
+  }
+ }
+}

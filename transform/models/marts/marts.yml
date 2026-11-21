@@ -47,6 +47,11 @@ models:
       UNKNOWN when the buyer has none. Lines priced 0.00 are kept and flagged.
       gross_amount_eur is quantity times price at purchase, before discounts and
       without returns.
+    config:
+      # Step 10: re-apply buyer_id's policy tag after every rebuild (a create or
+      # replace drops it). dbt sets policy tags only through persist_docs columns.
+      persist_docs:
+        columns: true
     data_tests:
       - dbt_utils.unique_combination_of_columns:
           arguments:
@@ -75,6 +80,13 @@ models:
               arguments:
                 to: ref('dim_country')
                 field: country_code
+      - name: buyer_id
+        description: >
+          The buyer, pseudonymous. Classified pii.identifier (docs/governance.md):
+          readable only by the tag's fine-grained readers. Nothing in the pipeline
+          selects it from this table; the marts and tests count rows instead.
+        policy_tags:
+          - "{{ var('g07_pii_identifier_tag') }}"
       - name: quantity
         data_tests:
           - dbt_utils.accepted_range:

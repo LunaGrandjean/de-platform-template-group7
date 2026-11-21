@@ -19,5 +19,10 @@ authenticated (see `docs/infra.md`).
 
 **Step 9** added the label convention ([`labels.tf`](terraform/labels.tf)) and a
 label-scoped budget ([`budget.tf`](terraform/budget.tf), declared but not created);
-see [`docs/costs.md`](../docs/costs.md). Next: **Step 10** tightens access, once the
-pipeline runs as its own service account.
+see [`docs/costs.md`](../docs/costs.md).
+
+**Step 10** added the classification taxonomy, its two policy tags and their
+readers ([`governance.tf`](terraform/governance.tf), created through the API and
+adopted by [`imports.tf`](terraform/imports.tf)), and narrowed the warehouse
+grant from dataEditor to dataViewer ([`iam.tf`](terraform/iam.tf)); see
+[`docs/governance.md`](../docs/governance.md).

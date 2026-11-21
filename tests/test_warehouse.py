@@ -117,5 +117,22 @@ class WarehouseTests(unittest.TestCase):
         self.assertTrue(client.delete_table.call_args.kwargs["not_found_ok"])
 
 
+    def test_rebuild_puts_buyer_id_policy_tag_back(self):
+        # Step 10: CREATE OR REPLACE drops policy tags; only buyer_id gets one back.
+        schema = [warehouse.bigquery.SchemaField("order_id", "INTEGER"),
+                  warehouse.bigquery.SchemaField("buyer_id", "STRING")]
+        table = SimpleNamespace(table_id="orders", reference="p.d.orders", schema=schema)
+        client = Mock()
+        warehouse.apply_policy_tags(client, table)
+        client.update_table.assert_called_once_with(table, ["schema"])
+        tags = {f.name: (list(f.policy_tags.names) if f.policy_tags else []) for f in table.schema}
+        self.assertEqual(tags, {"order_id": [], "buyer_id": [warehouse.PII_IDENTIFIER_TAG]})
+
+    def test_untagged_table_is_left_alone(self):
+        client = Mock()
+        warehouse.apply_policy_tags(client, SimpleNamespace(table_id="order_lines", schema=[]))
+        client.update_table.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

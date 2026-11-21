@@ -28,7 +28,7 @@ events. The platform targets daily units sold by product and country.
 | Luna Grandjean | [@LunaGrandjean](https://github.com/LunaGrandjean) | Initial platform design and documentation |
 | Omar Abdellatif | [@abdellatifomar61-ship-it](https://github.com/abdellatifomar61-ship-it) | Step 6 container images (Dockerfiles, Docker Hub tags, reproduction, retention, ADR 0006) and Step 7 Airflow orchestration (DAG, alerts, fire drill, back-fill, runbook, ADR 0007) |
 | Malek Saoudi | [@Msaoudi115](https://github.com/Msaoudi115) | Step 3 live Docker/Debezium deployment and evidence |
-| Anas Mossad | [@realay04](https://github.com/realay04) | Step 9 FinOps: label convention (Terraform, dbt jobs), budget, largest-cost analysis, the frozen-snapshot test optimisation, the ledger and ADR 0009 |
+| Anas Mossad | [@realay04](https://github.com/realay04) | Step 9 FinOps: label convention (Terraform, dbt jobs), budget, largest-cost analysis, the frozen-snapshot test optimisation, the ledger and ADR 0009. Step 10 governance: classification, policy tags, narrowed grant, erasure runbook and ADR 0010 |
 | Emile Gadenne | [@egadenne-ai](https://github.com/egadenne-ai) | Step 4 BigQuery warehouse, costed queries and ADR 0004; Step 8 Terraform (adoption by import, remote state, drift, pipeline identity, ADR 0008) |
 
 We are group 7 (`g07`). The cohort identifier has not been provided yet. Add it
@@ -313,6 +313,29 @@ Checked before opening: `tests/test_warehouse.py` 12 passed, `dbt ls` 103 nodes 
 | Transform image with `selectors.yml`, and `TRANSFORM_IMAGE` bumped in the DAG | Omar | Merging: the DAG passes `--selector`, and the current image `2026-11-17-e8df6e5` has no `selectors.yml` |
 | `terraform apply` of the labels (plan: 0 add, 5 change, 0 destroy) | Emile | Labels on the bucket and datasets; needs Terraform 1.17 and the team's go-ahead |
 | Billing account ID and project number | Course admin | Creating the budget (`count = 0` until then) |
+
+### Step 10: Classified, restricted, and erasable
+
+Every one of the 196 columns in our four datasets has a class and an owner. Two
+columns are enforced by a policy tag: `buyer_id` in `g07_warehouse.orders` and in
+`g07_gold.fct_order_items`. The dbt build passed 25 of 25 after the tag landed,
+because nothing in the pipeline reads `buyer_id` back. The two gaps that matter
+are written down, not hidden:
+
+- **The contact data can't be tagged.** BigQuery refused to tag the Bronze
+  street address and phone, because they live in plain external tables.
+- **No refusal could be shown.** The course grants every student fine-grained
+  read at project level, so our own queries were served.
+
+| Deliverable | Content |
+|---|---|
+| [Classification policy](docs/governance.md#3-classification-policy-every-column) | 196 columns: class, owner, reason. 7 free-text columns marked unclassified |
+| [Access matrix](docs/governance.md#2-access-matrix) | Engineer, analyst, pipeline and course admin against six classes, with a route for every "no" |
+| [Hardening](docs/governance.md#4-hardening-what-we-changed) | Taxonomy and tags ([`governance.tf`](infra/terraform/governance.tf)), tags applied by [dbt](transform/models/marts/marts.yml) and [`warehouse.py`](scripts/warehouse.py), the narrowed warehouse grant ([`iam.tf`](infra/terraform/iam.tf)) |
+| [Gaps](docs/governance.md#5-where-the-matrix-and-reality-differ) | Seven, worst first, each with what would close it |
+| [Erasure runbook](docs/runbooks/erasure.md) | Finding a buyer in every layer, the Bronze rewrite, the rebuilds, the copies that survive for 14 days, and the proof. **Not yet run**: the group decides which buyer |
+| [ADR 0010](docs/adr/0010-data-classification.md) | Classification over a view per consumer, a dataset per sensitivity level, or trust, and why it is the only one that survives access we cannot remove |
+| [Evidence](docs/evidence/step10/) | Column inventory, 30 days of readers, access before, the Bronze refusal, read checks, reader grants, tags and labels after, the audit-log check |
 
 ## Start it
 

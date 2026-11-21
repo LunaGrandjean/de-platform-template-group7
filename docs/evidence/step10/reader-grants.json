@@ -1,0 +1,31 @@
+{
+ "at_utc": "2026-11-20T18:44:19+00:00",
+ "tags": {
+  "pii-identifier": {
+   "my_permissions": [
+    "datacatalog.categories.fineGrainedGet",
+    "datacatalog.categories.setIamPolicy"
+   ],
+   "set_status": 200,
+   "bindings_after": [
+    {
+     "role": "roles/datacatalog.categoryFineGrainedReader",
+     "members": 5
+    }
+   ]
+  },
+  "pii-contact": {
+   "my_permissions": [
+    "datacatalog.categories.fineGrainedGet",
+    "datacatalog.categories.setIamPolicy"
+   ],
+   "set_status": 200,
+   "bindings_after": [
+    {
+     "role": "roles/datacatalog.categoryFineGrainedReader",
+     "members": 5
+    }
+   ]
+  }
+ }
+}

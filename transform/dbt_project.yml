@@ -16,6 +16,10 @@ clean-targets: ["target", "dbt_packages"]
 # the two share no order_id, so each order has exactly one origin.
 vars:
   scheduled_orders_from: "2026-09-15"
+  # Step 10: the pii-identifier policy tag (infra/terraform/governance.tf, output
+  # policy_tag_pii_identifier). Columns carrying it are readable only by its
+  # fine-grained readers (docs/governance.md).
+  g07_pii_identifier_tag: "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
 
 # Step 9: every BigQuery job dbt runs carries the group's label convention
 # (docs/costs.md). Query cost is attributed by the labels on the JOB, not on the

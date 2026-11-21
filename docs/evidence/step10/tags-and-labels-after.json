@@ -1,0 +1,111 @@
+{
+ "at_utc": "2026-11-20T18:46:36+00:00",
+ "tagged_columns": [
+  {
+   "column": "g07_warehouse.orders.buyer_id",
+   "policy_tags": [
+    "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+   ]
+  },
+  {
+   "column": "g07_gold.fct_order_items.buyer_id",
+   "policy_tags": [
+    "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+   ]
+  }
+ ],
+ "labels": {
+  "g07_warehouse.daily_demand": {
+   "step": "l04",
+   "layer": "warehouse",
+   "group": "g07"
+  },
+  "g07_warehouse.order_lines": {
+   "step": "l04",
+   "layer": "warehouse",
+   "group": "g07"
+  },
+  "g07_warehouse.orders": {
+   "step": "l04",
+   "layer": "warehouse",
+   "group": "g07"
+  },
+  "g07_gold.dim_country": {
+   "component": "dbt",
+   "env": "dev",
+   "layer": "gold",
+   "group": "g07"
+  },
+  "g07_gold.dim_date": {
+   "component": "dbt",
+   "env": "dev",
+   "layer": "gold",
+   "group": "g07"
+  },
+  "g07_gold.dim_product": {
+   "component": "dbt",
+   "env": "dev",
+   "layer": "gold",
+   "group": "g07"
+  },
+  "g07_gold.fct_daily_demand": {
+   "component": "dbt",
+   "env": "dev",
+   "layer": "gold",
+   "group": "g07"
+  },
+  "g07_gold.fct_order_items": {
+   "component": "dbt",
+   "env": "dev",
+   "layer": "gold",
+   "group": "g07"
+  },
+  "g07_bronze.customer_shipping": {
+   "step": "l04",
+   "layer": "bronze",
+   "group": "g07"
+  },
+  "g07_bronze.kafka_clickstream": {
+   "step": "l04",
+   "layer": "bronze",
+   "group": "g07"
+  },
+  "g07_bronze.order_items": {
+   "step": "l04",
+   "layer": "bronze",
+   "group": "g07"
+  },
+  "g07_bronze.orders": {
+   "step": "l04",
+   "layer": "bronze",
+   "group": "g07"
+  },
+  "g07_bronze.product": {
+   "step": "l04",
+   "layer": "bronze",
+   "group": "g07"
+  },
+  "g07_bronze.product_reviews": {
+   "step": "l04",
+   "layer": "bronze",
+   "group": "g07"
+  },
+  "g07_bronze.python_orders": {
+   "step": "l04",
+   "layer": "bronze",
+   "group": "g07"
+  },
+  "g07_bronze.review": {
+   "step": "l04",
+   "layer": "bronze",
+   "group": "g07"
+  },
+  "g07_bronze.scheduled_order_items": {},
+  "g07_bronze.scheduled_orders": {},
+  "g07_bronze.shipping_details": {
+   "step": "l04",
+   "layer": "bronze",
+   "group": "g07"
+  }
+ }
+}

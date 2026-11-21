@@ -77,3 +77,21 @@ import {
   to       = google_service_account.pipeline[0]
   id       = "projects/${var.project_id}/serviceAccounts/${each.value}@${var.project_id}.iam.gserviceaccount.com"
 }
+
+# Step 10: the taxonomy and its two tags were created through the API on
+# 2026-11-20 (docs/evidence/step10/taxonomy-created.json), because apply needs
+# Terraform 1.17. The next apply adopts them instead of creating duplicates.
+import {
+  to = google_data_catalog_taxonomy.g07
+  id = "projects/${var.project_id}/locations/${var.region}/taxonomies/839634828442859651"
+}
+
+import {
+  to = google_data_catalog_policy_tag.pii_identifier
+  id = "projects/${var.project_id}/locations/${var.region}/taxonomies/839634828442859651/policyTags/2241334323157841260"
+}
+
+import {
+  to = google_data_catalog_policy_tag.pii_contact
+  id = "projects/${var.project_id}/locations/${var.region}/taxonomies/839634828442859651/policyTags/1875540059977754680"
+}

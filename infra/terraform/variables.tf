@@ -73,6 +73,18 @@ variable "budget_alert_email" {
   default     = "amohamed@albertschool.com"
 }
 
+variable "pii_readers" {
+  description = "Who may read columns tagged pii-identifier or pii-contact: the engineer row of the access matrix (docs/governance.md)."
+  type        = list(string)
+  default = [
+    "user:amohamed@albertschool.com",
+    "user:egadenne@albertschool.com",
+    "user:lgrandjean@albertschool.com",
+    "user:msaoudi@albertschool.com",
+    "user:oabdellatif@albertschool.com",
+  ]
+}
+
 variable "dataset_readers" {
   description = "Group members with read access to g07_bronze."
   type        = list(string)

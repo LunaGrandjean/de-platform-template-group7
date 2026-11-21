@@ -36,6 +36,11 @@ LABELS = {"group": "g07", "env": "dev", "layer": "", "component": "warehouse"}
 # Query cost is attributed by the labels on the job, so every job this script
 # runs carries them too (merged into each job's own config by the client).
 JOB_LABELS = {**LABELS, "layer": "warehouse"}
+# Step 10: columns classified pii.identifier (docs/governance.md). CREATE OR REPLACE
+# drops policy tags, so native() puts them back after every rebuild.
+PII_IDENTIFIER_TAG = ("projects/data-engineering-i1/locations/europe-west1/taxonomies/"
+                      "839634828442859651/policyTags/2241334323157841260")
+POLICY_TAGS = {"orders": {"buyer_id": PII_IDENTIFIER_TAG}}
 
 
 def write_json(path: Path, value) -> None:
@@ -227,9 +232,30 @@ def native(client: bigquery.Client) -> None:
                       "build_bytes_processed": job.total_bytes_processed,
                       "build_job_id": job.job_id})
         print(f"{table.reference}: {table.num_rows} rows, {table.num_bytes} bytes", flush=True)
+        apply_policy_tags(client, table)
     write_json(EVIDENCE_DIR / "native-tables.json", {
         "verified_at_utc": datetime.now(timezone.utc).isoformat(),
         "prechecks": checks, "tables": built})
+
+
+def with_policy_tags(schema: list, tags: dict) -> list:
+    """The schema with each named column's policy tag set; other columns unchanged."""
+    fields = []
+    for field in schema:
+        api = field.to_api_repr()
+        if field.name in tags:
+            api["policyTags"] = {"names": [tags[field.name]]}
+        fields.append(bigquery.SchemaField.from_api_repr(api))
+    return fields
+
+
+def apply_policy_tags(client: bigquery.Client, table: bigquery.Table) -> None:
+    tags = POLICY_TAGS.get(table.table_id)
+    if not tags:
+        return
+    table.schema = with_policy_tags(table.schema, tags)
+    client.update_table(table, ["schema"])
+    print(f"{table.reference}: policy tag on {', '.join(sorted(tags))}", flush=True)
 
 
 def validate_prechecks(checks: dict) -> None:

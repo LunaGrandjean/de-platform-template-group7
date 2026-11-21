@@ -1,0 +1,52 @@
+{
+ "source": "dataset access entries and bucket IAM, 2026-11-20 before any Step 10 change; members reduced to roles",
+ "access": {
+  "g07_bronze": [
+   "OWNER specialGroup=projectOwners",
+   "OWNER userByEmail=member:emile",
+   "READER specialGroup=projectReaders",
+   "READER userByEmail=member:anas",
+   "READER userByEmail=member:luna",
+   "READER userByEmail=member:malek",
+   "READER userByEmail=member:omar",
+   "WRITER specialGroup=projectWriters"
+  ],
+  "g07_bronze:max_time_travel_hours": "168",
+  "g07_warehouse": [
+   "OWNER specialGroup=projectOwners",
+   "OWNER userByEmail=member:emile",
+   "READER specialGroup=projectReaders",
+   "WRITER specialGroup=projectWriters",
+   "WRITER userByEmail=member:anas",
+   "WRITER userByEmail=member:luna",
+   "WRITER userByEmail=member:malek",
+   "WRITER userByEmail=member:omar"
+  ],
+  "g07_warehouse:max_time_travel_hours": "168",
+  "g07_silver": [
+   "OWNER specialGroup=projectOwners",
+   "OWNER userByEmail=member:malek",
+   "READER specialGroup=projectReaders",
+   "WRITER specialGroup=projectWriters"
+  ],
+  "g07_silver:max_time_travel_hours": "168",
+  "g07_gold": [
+   "OWNER specialGroup=projectOwners",
+   "OWNER userByEmail=member:malek",
+   "READER specialGroup=projectReaders",
+   "WRITER specialGroup=projectWriters"
+  ],
+  "g07_gold:max_time_travel_hours": "168",
+  "bucket": [
+   "roles/storage.legacyBucketOwner projectEditor:data-engineering-i1",
+   "roles/storage.legacyBucketOwner projectOwner:data-engineering-i1",
+   "roles/storage.legacyBucketReader projectViewer:data-engineering-i1",
+   "roles/storage.legacyObjectOwner projectEditor:data-engineering-i1",
+   "roles/storage.legacyObjectOwner projectOwner:data-engineering-i1",
+   "roles/storage.legacyObjectReader projectViewer:data-engineering-i1"
+  ],
+  "bucket:versioning": false,
+  "bucket:soft_delete_s": 604800,
+  "bucket:retention": null
+ }
+}
