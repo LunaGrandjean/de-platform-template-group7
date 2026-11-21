@@ -289,7 +289,8 @@ bindings ([infra.md](docs/infra.md#the-pipelines-identity-steps-7-and-8)).
 Every resource and every BigQuery job our code runs now carries four labels (`group`,
 `env`, `layer`, `component`), so what the pipeline costs is a query, not a guess. Spend
 before 2026-11-19 carries no label and stays unattributable. Our largest cost is BigQuery
-Analysis (25.1 GiB billed in November, 0.00 invoiced inside the free tier). One daily
+Analysis (25.1 GiB billed in November; an estimated 0.00 within the free tier, unverified
+because we cannot read the billing account). One daily
 `dbt build` billed 1,215 MiB; skipping the tests of the frozen Step 2 snapshot on six days
 out of seven brought it to 772 MiB (-36.5%), measured on 2026-11-19 with gold unchanged.
 

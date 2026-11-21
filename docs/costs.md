@@ -197,10 +197,16 @@ filtered to query jobs that read or wrote a `g07_*` dataset, plus `__TABLES__`
 for table sizes and the GCS object listing. Two limits: days on which nothing
 ran have no row at all, and this measures units, not invoiced money.
 
-The project's whole query volume since 2026-11-01 is 115 GiB (11,943 jobs),
-well inside the shared 1 TiB monthly free tier, so **the invoiced amount for
-all of this is 0.00**. The dollars below are the units priced at list: what
-they would cost outside the free tier.
+The project's whole query volume since 2026-11-01 is 115 GiB (11,943 jobs).
+That is well inside the 1 TiB monthly free tier, so our **estimated** invoiced
+amount is 0.00. **Not verified:**
+- The free tier belongs to the billing account, not the project, and other
+  projects on the same account may already have used it.
+- We cannot read the billing account or its export (section 3,
+  [billing-access.json](evidence/step9/billing-access.json)).
+
+The dollars below are the units priced at list: what they would cost with no
+free tier left.
 
 The query, runnable as is:
 
@@ -282,8 +288,8 @@ MiB: **772 MiB billed and 198 MiB processed, -36.5% per daily run**, with
 design). Gold came out identical: same row count in all five tables. Every one
 of the 58 jobs carried `group=g07`. With the
 Monday full build, a month goes from 35.6 GiB to 24.5 GiB: **11.1 GiB a month
-saved, about $0.08/month at list**, and 0.00 invoiced, because we are inside
-the free tier. The unit saving is the fact; the dollars are that fact, priced.
+saved, about $0.08/month at list**. The estimated invoice saving is 0.00, if
+the account's free tier is not already used up (not verifiable, section 3). The unit saving is the fact; the dollars are that fact, priced.
 
 **What would tell us we were wrong:**
 
@@ -333,7 +339,7 @@ measured 2026-11-19. Prices read 2026-11-19, except Cloud Storage operations
 | 12 dataset IAM bindings | Nothing | - | free | $0 |
 | `g07-pipeline` service account and its 2 bucket and 4 dataset bindings (not created) | Nothing | - | free | $0 |
 | Budget and its email channel (not created) | Nothing | - | free | $0 |
-| **Total** | | | | **~$0.27/month at list, 0.00 invoiced** |
+| **Total** | | | | **~$0.27/month at list; estimated 0.00 within the free tier, not verified** |
 
 Outside GCP and outside this ledger: Airflow and the source system run on a
 laptop (Docker Desktop), and the Docker Hub repositories under `omara11/` are
