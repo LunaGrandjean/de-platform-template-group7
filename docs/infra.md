@@ -37,7 +37,7 @@ authenticated: the author pastes the plan output in the PR description, and
 | `google_bigquery_dataset_iam_member.bronze_owner` | Émile, `dataOwner` on `g07_bronze` | Created the dataset; can grant access. |
 | `google_bigquery_dataset_iam_member.bronze_readers[*]` (4) | Anas, Luna, Malek, Omar, `dataViewer` on `g07_bronze` | Every member reads Bronze to build and debug Silver. Read only: Bronze is never edited by hand. |
 | `google_bigquery_dataset_iam_member.warehouse_owner` | Émile, `dataOwner` on `g07_warehouse` | Created the dataset; can grant access. |
-| `google_bigquery_dataset_iam_member.warehouse_writers[*]` (4) | Anas, Luna, Malek, Omar, `dataEditor` on `g07_warehouse` | Every member ran Step 4 loads and tuning experiments. |
+| `google_bigquery_dataset_iam_member.warehouse_readers[*]` (4) | Anas, Luna, Malek, Omar, `dataViewer` on `g07_warehouse` | Step 10 narrowed it from `dataEditor`: the Step 4 loads are finished and only the owner rebuilds the warehouse ([governance.md](governance.md#the-narrowed-grant)). |
 | `google_bigquery_dataset_iam_member.silver_owner` | Malek, `dataOwner` on `g07_silver` | First `dbt build` created the dataset under his identity. |
 | `google_bigquery_dataset_iam_member.gold_owner` | Malek, `dataOwner` on `g07_gold` | Same. |
 | `google_service_account.pipeline` + 5 bindings | `g07-pipeline@…` (**not created**, `count = 0`) | The identity Airflow (Step 7) should run the images as, instead of a person. Our accounts lack `iam.serviceAccounts.create` in the shared project (`testIamPermissions`, 2026-11-08). Created once the course admin grants it: set `create_service_account = true`. Grants: `objectUser` on the bucket, `dataEditor` on the four datasets (see below). |

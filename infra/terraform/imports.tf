@@ -49,10 +49,14 @@ import {
   id = "${local.ds_iam}/g07_warehouse roles/bigquery.dataOwner ${local.bronze_owner}"
 }
 
-import {
-  for_each = toset(local.warehouse_users)
-  to       = google_bigquery_dataset_iam_member.warehouse_writers[each.value]
-  id       = "${local.ds_iam}/g07_warehouse roles/bigquery.dataEditor ${each.value}"
+# Step 10, the narrowed grant: warehouse_writers (dataEditor, already in state
+# since the Step 8 apply) is renamed warehouse_readers, which says dataViewer.
+# role forces replacement, so the plan shows -/+ for each member: the dataEditor
+# binding destroyed, a dataViewer one created. That replace IS the narrowing, in
+# one apply, with nothing done by hand.
+moved {
+  from = google_bigquery_dataset_iam_member.warehouse_writers
+  to   = google_bigquery_dataset_iam_member.warehouse_readers
 }
 
 import {
