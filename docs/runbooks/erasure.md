@@ -60,7 +60,8 @@ UNION ALL SELECT 'customer_shipping', _FILE_NAME, COUNT(*) FROM `data-engineerin
 UNION ALL SELECT 'shipping_details', _FILE_NAME, COUNT(*) FROM `data-engineering-i1.g07_bronze.shipping_details`
   WHERE address_id IN (SELECT address_id FROM `data-engineering-i1.g07_bronze.customer_shipping` WHERE c_id = id) GROUP BY 2
 UNION ALL SELECT 'kafka_clickstream', _FILE_NAME, COUNT(*) FROM `data-engineering-i1.g07_bronze.kafka_clickstream`
-  WHERE event_date >= '2000-01-01' AND (buyer_id = id OR STRPOS(raw_value, id) > 0) GROUP BY 2;
+  WHERE event_date >= '2000-01-01' AND (buyer_id = id OR STRPOS(SAFE_CONVERT_BYTES_TO_STRING(raw_value), id) > 0) GROUP BY 2;
+-- raw_value is BYTES: decode it before searching (STRPOS on BYTES with a STRING id is a type error).
 ```
 
 `python_orders`, `scheduled_orders` and `kafka_clickstream` refuse a query
@@ -80,9 +81,11 @@ which sees base64, not the id, and would have found nothing:
 CREATE OR REPLACE EXTERNAL TABLE `data-engineering-i1.g07_warehouse.tmp_erasure_cdc_orders`
 OPTIONS (format = 'PARQUET', uris = ['gs://data-engineering-i1-marketplace-group/bronze/cdc/orders/*']);
 SELECT _FILE_NAME f, COUNT(*) n FROM `data-engineering-i1.g07_warehouse.tmp_erasure_cdc_orders`
-WHERE COALESCE(JSON_VALUE(SAFE_CONVERT_BYTES_TO_STRING(raw_value), '$.after.buyer_id'),
-               JSON_VALUE(SAFE_CONVERT_BYTES_TO_STRING(raw_value), '$.before.buyer_id')) = 'AE....'
+WHERE JSON_VALUE(SAFE_CONVERT_BYTES_TO_STRING(raw_value), '$.after.buyer_id') = 'AE....'
+   OR JSON_VALUE(SAFE_CONVERT_BYTES_TO_STRING(raw_value), '$.before.buyer_id') = 'AE....'
 GROUP BY 1;
+-- Both sides, with OR, never COALESCE: an update can move an order from our buyer
+-- (before) to another (after), and COALESCE would only look at after.
 DROP EXTERNAL TABLE `data-engineering-i1.g07_warehouse.tmp_erasure_cdc_orders`;
 ```
 
@@ -148,7 +151,7 @@ read on 2026-11-20 ([access-before.json](../evidence/step10/access-before.json))
 
 | Copy | Setting | How long | What we would have to do |
 |---|---|---|---|
-| GCS soft delete | `soft_delete_policy` 604,800 s (`infra/terraform/main.tf`) | **7 days** after each overwrite | Wait it out, or have the admin hard-delete the soft-deleted versions. Object versioning is **off**, so no older generation survives beyond that |
+| GCS soft delete | `soft_delete_policy` 604,800 s (`infra/terraform/main.tf`) | **7 days** after each overwrite | Wait it out. Soft-deleted objects cannot be purged before the retention ends, not even by an admin: they can only be restored or left to expire. Lowering the retention only applies to objects deleted afterwards. Object versioning is **off**, so no older generation survives beyond that |
 | BigQuery time travel | `max_time_travel_hours = 168` on all four datasets | **7 days** | Lower to the 48-hour minimum before erasing (dataset option, `main.tf`), or wait |
 | BigQuery fail-safe | fixed by Google, not configurable | **7 more days** after time travel | Nothing; only Google support can read it. The person is fully gone **14 days** after step 4 |
 | Old dbt and warehouse tables | `CREATE OR REPLACE` keeps nothing beyond time travel | covered above | none |
@@ -192,4 +195,5 @@ Write an erasure record in the issue that carried the request, with no
 | Time | About 25 minutes of work, almost all of it working out how to search the CDC files. Running the commands took about 70 seconds |
 | What did not work | Query A failed on the first run (missing partition filters). Query B as first written would have matched nothing (BYTES columns, base64 in `TO_JSON_STRING`). Both fixed above |
 | Not erased | The source PostgreSQL and the Kafka topic (section 6): a re-extract of 2026-09-23, or a CDC replay, would bring the buyer back. The 6 old object generations, held by GCS soft delete. The old gold tables, held by time travel and fail-safe |
+| Recheck, 2026-11-22 | After review on PR #10, the search was rerun with both `before` and `after` OR-ed, the raw key, and any occurrence of the id in the decoded CDC and clickstream messages: 0 rows in all six places ([erasure-recheck.json](../evidence/step10/erasure-recheck.json)). The corrected query A passes a BigQuery dry run as printed above |
 | 14-day window closes | 2026-12-05: 7 days of soft delete and time travel, then 7 of fail-safe for the BigQuery tables |

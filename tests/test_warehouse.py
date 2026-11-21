@@ -134,5 +134,35 @@ class WarehouseTests(unittest.TestCase):
         client.update_table.assert_not_called()
 
 
+    def test_orders_is_tagged_before_any_row_is_inserted(self):
+        # Step 10 review: create empty, tag, then insert. Never rows first.
+        client = Mock()
+        events = []
+        client.query.side_effect = lambda sql, **kw: events.append("insert" if "INSERT" in sql else "create") or Mock()
+        client.update_table.side_effect = lambda *a, **kw: events.append("tag")
+        client.get_table.return_value = SimpleNamespace(
+            table_id="orders", reference="p.d.orders",
+            schema=[warehouse.bigquery.SchemaField("buyer_id", "STRING")])
+        names = {"br": "p.br", "wh": "p.wh"}
+        warehouse.build_native(client, "orders", warehouse.NATIVE_SQL["orders"], names, None)
+        self.assertEqual(events, ["create", "tag", "insert"])
+
+    def test_failed_tag_leaves_orders_empty(self):
+        client = Mock()
+        client.update_table.side_effect = Forbidden("no setCategory")
+        client.get_table.return_value = SimpleNamespace(
+            table_id="orders", reference="p.d.orders",
+            schema=[warehouse.bigquery.SchemaField("buyer_id", "STRING")])
+        with self.assertRaises(Forbidden):
+            warehouse.build_native(client, "orders", warehouse.NATIVE_SQL["orders"], {"br": "b", "wh": "w"}, None)
+        sent = [c.args[0] for c in client.query.call_args_list]
+        self.assertEqual(len(sent), 1)
+        self.assertNotIn("INSERT", sent[0])
+
+    def test_classified_table_cannot_be_built_in_one_statement(self):
+        with self.assertRaises(RuntimeError):
+            warehouse.build_native(Mock(), "orders", "CREATE OR REPLACE TABLE x AS SELECT 1", {"br": "b", "wh": "w"}, None)
+
+
 if __name__ == "__main__":
     unittest.main()
