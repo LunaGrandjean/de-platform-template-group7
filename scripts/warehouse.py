@@ -36,6 +36,11 @@ LABELS = {"group": "g07", "env": "dev", "layer": "", "component": "warehouse"}
 # Query cost is attributed by the labels on the job, so every job this script
 # runs carries them too (merged into each job's own config by the client).
 JOB_LABELS = {**LABELS, "layer": "warehouse"}
+# Step 10: columns classified pii.identifier (docs/governance.md). CREATE OR REPLACE
+# drops policy tags, so native() puts them back after every rebuild.
+PII_IDENTIFIER_TAG = ("projects/data-engineering-i1/locations/europe-west1/taxonomies/"
+                      "839634828442859651/policyTags/2241334323157841260")
+POLICY_TAGS = {"orders": {"buyer_id": PII_IDENTIFIER_TAG}}
 
 
 def write_json(path: Path, value) -> None:
@@ -156,13 +161,18 @@ def external_step3(client: bigquery.Client) -> None:
 
 NATIVE_SQL = {
     # Typed copy of Bronze orders. Duplicate business orders are kept.
-    "orders": """
-CREATE OR REPLACE TABLE `{wh}.orders`
+    # Step 10: two statements, not CREATE ... AS SELECT. The table is created
+    # EMPTY, native() tags buyer_id, and only then are the rows inserted, so
+    # buyer_id is never readable untagged; if tagging fails the table stays empty.
+    "orders": ["""
+CREATE OR REPLACE TABLE `{wh}.orders` (
+  order_id INT64, buyer_id STRING, discount_id INT64, payment_id INT64, order_date DATE)
 PARTITION BY DATE_TRUNC(order_date, MONTH)
 OPTIONS (require_partition_filter = TRUE,
          description = "Typed Bronze orders, month partitions; not deduplicated (Silver's job)",
          labels = [("group", "g07"), ("env", "dev"), ("layer", "warehouse"), ("component", "warehouse")])
-AS
+""", """
+INSERT INTO `{wh}.orders` (order_id, buyer_id, discount_id, payment_id, order_date)
 SELECT
   SAFE_CAST(order_id AS INT64) AS order_id,
   NULLIF(buyer_id, '') AS buyer_id,
@@ -170,7 +180,7 @@ SELECT
   SAFE_CAST(payment_id AS INT64) AS payment_id,
   SAFE_CAST(order_date AS DATE) AS order_date
 FROM `{br}.orders`
-""",
+"""],
     # order_items has no date: it takes its parent's order_date so it can be
     # partitioned, and is clustered by product for per-product questions.
     "order_lines": """
@@ -216,8 +226,7 @@ def native(client: bigquery.Client) -> None:
     validate_prechecks(checks)
     built = []
     for name, sql in NATIVE_SQL.items():
-        job = client.query(sql.format(**names), job_config=capped)
-        job.result()
+        job = build_native(client, name, sql, names, capped)
         table = client.get_table(f"{names['wh']}.{name}")
         built.append({"table": str(table.reference), "rows": table.num_rows,
                       "logical_bytes": table.num_bytes,
@@ -230,6 +239,45 @@ def native(client: bigquery.Client) -> None:
     write_json(EVIDENCE_DIR / "native-tables.json", {
         "verified_at_utc": datetime.now(timezone.utc).isoformat(),
         "prechecks": checks, "tables": built})
+
+
+def build_native(client: bigquery.Client, name: str, sql, names: dict, capped):
+    """Run one table's statements; return the job that loaded the rows.
+
+    A table with classified columns comes as [create empty, insert]: its policy
+    tags go on between the two, and a failure to tag raises before any row lands.
+    """
+    statements = sql if isinstance(sql, list) else [sql]
+    if POLICY_TAGS.get(name) and len(statements) < 2:
+        raise RuntimeError(f"{name} has classified columns: create it empty, tag it, then insert")
+    job = client.query(statements[0].format(**names), job_config=capped)
+    job.result()
+    if POLICY_TAGS.get(name):
+        apply_policy_tags(client, client.get_table(f"{names['wh']}.{name}"))
+    for statement in statements[1:]:
+        job = client.query(statement.format(**names), job_config=capped)
+        job.result()
+    return job
+
+
+def with_policy_tags(schema: list, tags: dict) -> list:
+    """The schema with each named column's policy tag set; other columns unchanged."""
+    fields = []
+    for field in schema:
+        api = field.to_api_repr()
+        if field.name in tags:
+            api["policyTags"] = {"names": [tags[field.name]]}
+        fields.append(bigquery.SchemaField.from_api_repr(api))
+    return fields
+
+
+def apply_policy_tags(client: bigquery.Client, table: bigquery.Table) -> None:
+    tags = POLICY_TAGS.get(table.table_id)
+    if not tags:
+        return
+    table.schema = with_policy_tags(table.schema, tags)
+    client.update_table(table, ["schema"])
+    print(f"{table.reference}: policy tag on {', '.join(sorted(tags))}", flush=True)
 
 
 def validate_prechecks(checks: dict) -> None:

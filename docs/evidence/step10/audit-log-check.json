@@ -1,0 +1,38 @@
+{
+ "note": "Cloud Logging, 2026-11-20. Data Access entries: 0 returned to our accounts (private logs need logging.privateLogEntries.list, which we lack; the API filters silently rather than refusing). Admin Activity is visible and records who tagged the columns.",
+ "reads_of_tagged_tables": [],
+ "refusals_mentioning_g07": [],
+ "any_data_access_today": 0,
+ "any_admin_activity_bigquery_today": [
+  {
+   "t": "2026-11-20T18:45:55",
+   "who": "member:anas",
+   "method": "google.cloud.bigquery.v2.JobService.InsertJob",
+   "status": ""
+  },
+  {
+   "t": "2026-11-20T18:45:50",
+   "who": "member:anas",
+   "method": "google.cloud.bigquery.v2.TableService.PatchTable",
+   "status": ""
+  },
+  {
+   "t": "2026-11-20T18:45:50",
+   "who": "member:anas",
+   "method": "tableservice.update",
+   "status": ""
+  },
+  {
+   "t": "2026-11-20T18:45:48",
+   "who": "member:anas",
+   "method": "google.cloud.bigquery.v2.JobService.InsertJob",
+   "status": ""
+  },
+  {
+   "t": "2026-11-20T18:41:16",
+   "who": "member:anas",
+   "method": "google.cloud.bigquery.v2.TableService.PatchTable",
+   "status": ""
+  }
+ ]
+}

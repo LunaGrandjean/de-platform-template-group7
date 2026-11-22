@@ -1,0 +1,58 @@
+{
+ "at_utc": "2026-11-20T18:40:06+00:00",
+ "calls": [
+  {
+   "method": "POST",
+   "url": "{base}/taxonomies",
+   "status": 200,
+   "body": {
+    "name": "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651",
+    "displayName": "g07-marketplace-classification",
+    "description": "Group 7 column classes (Step 10). Shared project: prefixed g07. Owner: group 7, docs/governance.md.",
+    "taxonomyTimestamps": {
+     "createTime": "2026-11-20T18:40:07.253Z",
+     "updateTime": "2026-11-20T18:40:07.253Z"
+    },
+    "activatedPolicyTypes": [
+     "FINE_GRAINED_ACCESS_CONTROL"
+    ],
+    "service": {}
+   }
+  },
+  {
+   "method": "GET",
+   "url": "{base}/taxonomies/839634828442859651/policyTags",
+   "status": 200,
+   "body": {}
+  },
+  {
+   "method": "POST",
+   "url": "{base}/taxonomies/839634828442859651/policyTags",
+   "status": 200,
+   "body": {
+    "name": "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260",
+    "displayName": "pii-identifier",
+    "description": "A key that points at one person (buyer_id, customer_id, session_id). Pseudonymous, still personal data under GDPR."
+   }
+  },
+  {
+   "method": "POST",
+   "url": "{base}/taxonomies/839634828442859651/policyTags",
+   "status": 200,
+   "body": {
+    "name": "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680",
+    "displayName": "pii-contact",
+    "description": "Directly identifying contact data (street address, phone). Lives only in Bronze today, where it cannot be enforced."
+   }
+  }
+ ],
+ "result": {
+  "taxonomy": "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651",
+  "activatedPolicyTypes": [
+   "FINE_GRAINED_ACCESS_CONTROL"
+  ],
+  "pii-identifier": "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260",
+  "pii-contact": "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680"
+ },
+ "note": "Created through the Data Catalog API (no gcloud create command exists); adopted by Terraform through the import blocks in infra/terraform/imports.tf. The listing of other groups' taxonomies is left out."
+}

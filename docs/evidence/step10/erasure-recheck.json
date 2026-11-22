@@ -1,0 +1,32 @@
+{
+ "at_utc": "2026-11-21T23:37:45+00:00",
+ "why": "PR #10 review: the 2026-11-21 search used COALESCE(after, before) and an undecoded raw_value; rerun with both sides OR-ed, the raw key, and any occurrence of the id in the decoded message",
+ "runbook_query_A_dry_run": "OK",
+ "results": {
+  "bronze.cdc.orders": {
+   "rows": 0,
+   "job": "06564983-64e6-4cfd-b6ba-d2dce2f7c7be"
+  },
+  "bronze.cdc.order_items": {
+   "rows": 0,
+   "job": "8de41285-00ff-4db0-8836-2daf0bc05ab4"
+  },
+  "bronze.cdc.customer_shipping": {
+   "rows": 0,
+   "job": "be0c03c9-e011-4dbd-b958-f690a9ebc516"
+  },
+  "bronze.cdc.review": {
+   "rows": 0,
+   "job": "a89d6ef5-1df5-4f8c-b2b3-0455bd790bcf"
+  },
+  "bronze.cdc.shipping_details": {
+   "rows": 0,
+   "job": "f100d8fe-692f-40f7-b1d9-4a41250107b0"
+  },
+  "bronze.kafka_clickstream (buyer_id or decoded raw_value)": {
+   "rows": 0,
+   "job": "d36152de-aa57-48b4-b3cf-f54fff7d0ee7"
+  }
+ },
+ "throwaway_tables_dropped": true
+}

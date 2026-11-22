@@ -1,0 +1,77 @@
+{
+ "note": "Our own accounts were SERVED, not refused: the tags' own IAM policy was empty, yet testIamPermissions showed datacatalog.categories.fineGrainedGet inherited from above the taxonomy (project level). See docs/governance.md, gaps.",
+ "runs": [
+  {
+   "label": "after tagging warehouse, before any reader grant",
+   "at_utc": "2026-11-20T18:41:41+00:00",
+   "queries": [
+    {
+     "query": "warehouse buyer_id (tagged)",
+     "sql": "SELECT buyer_id FROM `data-engineering-i1.g07_warehouse.orders` WHERE order_date >= '2026-09-01' LIMIT 3",
+     "result": "served",
+     "rows": 3
+    },
+    {
+     "query": "warehouse other columns",
+     "sql": "SELECT * EXCEPT (buyer_id) FROM `data-engineering-i1.g07_warehouse.orders` WHERE order_date >= '2026-09-01' LIMIT 1",
+     "result": "served",
+     "rows": 1
+    },
+    {
+     "query": "warehouse count(*)",
+     "sql": "SELECT COUNT(*) n FROM `data-engineering-i1.g07_warehouse.orders` WHERE order_date >= '2026-09-01'",
+     "result": "served",
+     "rows": 1
+    },
+    {
+     "query": "gold buyer_id",
+     "sql": "SELECT buyer_id FROM `data-engineering-i1.g07_gold.fct_order_items` LIMIT 3",
+     "result": "served",
+     "rows": 3
+    },
+    {
+     "query": "gold other columns",
+     "sql": "SELECT * EXCEPT (buyer_id) FROM `data-engineering-i1.g07_gold.fct_order_items` LIMIT 1",
+     "result": "served",
+     "rows": 1
+    }
+   ]
+  },
+  {
+   "label": "retry 1 min later",
+   "at_utc": "2026-11-20T18:43:12+00:00",
+   "queries": [
+    {
+     "query": "warehouse buyer_id (tagged)",
+     "sql": "SELECT buyer_id FROM `data-engineering-i1.g07_warehouse.orders` WHERE order_date >= '2026-09-01' LIMIT 3",
+     "result": "served",
+     "rows": 3
+    },
+    {
+     "query": "warehouse other columns",
+     "sql": "SELECT * EXCEPT (buyer_id) FROM `data-engineering-i1.g07_warehouse.orders` WHERE order_date >= '2026-09-01' LIMIT 1",
+     "result": "served",
+     "rows": 1
+    },
+    {
+     "query": "warehouse count(*)",
+     "sql": "SELECT COUNT(*) n FROM `data-engineering-i1.g07_warehouse.orders` WHERE order_date >= '2026-09-01'",
+     "result": "served",
+     "rows": 1
+    },
+    {
+     "query": "gold buyer_id",
+     "sql": "SELECT buyer_id FROM `data-engineering-i1.g07_gold.fct_order_items` LIMIT 3",
+     "result": "served",
+     "rows": 3
+    },
+    {
+     "query": "gold other columns",
+     "sql": "SELECT * EXCEPT (buyer_id) FROM `data-engineering-i1.g07_gold.fct_order_items` LIMIT 1",
+     "result": "served",
+     "rows": 1
+    }
+   ]
+  }
+ ]
+}

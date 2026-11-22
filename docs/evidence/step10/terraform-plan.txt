@@ -1,0 +1,344 @@
+# terraform plan, read-only (-lock=false), 2026-11-20, Terraform 1.16.6 on a scratch copy with the 1.17 pin relaxed.
+# Emails replaced by member names. Nothing was applied.
+
+google_data_catalog_taxonomy.g07: Preparing import... [id=projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651]
+google_data_catalog_taxonomy.g07: Refreshing state... [id=projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651]
+google_bigquery_dataset.silver: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_silver]
+google_bigquery_dataset.gold: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_gold]
+google_storage_bucket.bronze: Refreshing state... [id=data-engineering-i1-marketplace-group]
+google_bigquery_dataset.warehouse: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse]
+google_bigquery_dataset.bronze: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze]
+google_data_catalog_policy_tag.pii_contact: Preparing import... [id=projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680]
+google_data_catalog_policy_tag.pii_identifier: Preparing import... [id=projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260]
+google_data_catalog_policy_tag.pii_identifier: Refreshing state... [id=projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260]
+google_data_catalog_policy_tag.pii_contact: Refreshing state... [id=projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680]
+google_bigquery_dataset_iam_member.silver_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_silver/roles/bigquery.dataOwner/user:<malek>]
+google_bigquery_dataset_iam_member.gold_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_gold/roles/bigquery.dataOwner/user:<malek>]
+google_bigquery_dataset_iam_member.warehouse_readers["user:<malek>"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:<malek>]
+google_bigquery_dataset_iam_member.bronze_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataOwner/user:<emile>]
+google_bigquery_dataset_iam_member.warehouse_owner: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataOwner/user:<emile>]
+google_bigquery_dataset_iam_member.warehouse_readers["user:<luna>"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:<luna>]
+google_bigquery_dataset_iam_member.warehouse_readers["user:<anas>"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:<anas>]
+google_bigquery_dataset_iam_member.warehouse_readers["user:<omar>"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:<omar>]
+google_bigquery_dataset_iam_member.bronze_readers["user:<anas>"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:<anas>]
+google_bigquery_dataset_iam_member.bronze_readers["user:<omar>"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:<omar>]
+google_bigquery_dataset_iam_member.bronze_readers["user:<luna>"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:<luna>]
+google_bigquery_dataset_iam_member.bronze_readers["user:<malek>"]: Refreshing state... [id=projects/data-engineering-i1/datasets/g07_bronze/roles/bigquery.dataViewer/user:<malek>]
+
+Terraform used the selected providers to generate the following execution
+plan. Resource actions are indicated with the following symbols:
+  + create
+  ~ update in-place
+-/+ destroy and then create replacement
+
+Terraform will perform the following actions:
+
+  # google_bigquery_dataset.bronze will be updated in-place
+  ~ resource "google_bigquery_dataset" "bronze" {
+      ~ effective_labels                = {
+          + "component" = "warehouse"
+          + "env"       = "dev"
+          - "step"      = "l04" -> null
+            # (2 unchanged elements hidden)
+        }
+        id                              = "projects/data-engineering-i1/datasets/g07_bronze"
+      ~ labels                          = {
+          + "component" = "warehouse"
+          - "group"     = "g07" -> null
+          - "step"      = "l04" -> null
+            # (1 unchanged element hidden)
+        }
+      ~ terraform_labels                = {
+          + "component" = "warehouse"
+          + "env"       = "dev"
+          - "step"      = "l04" -> null
+            # (2 unchanged elements hidden)
+        }
+        # (18 unchanged attributes hidden)
+
+        # (8 unchanged blocks hidden)
+    }
+
+  # google_bigquery_dataset.gold will be updated in-place
+  ~ resource "google_bigquery_dataset" "gold" {
+      ~ effective_labels                = {
+          + "component" = "dbt"
+          + "env"       = "dev"
+          + "group"     = "g07"
+          + "layer"     = "gold"
+        }
+        id                              = "projects/data-engineering-i1/datasets/g07_gold"
+      ~ labels                          = {
+          + "component" = "dbt"
+          + "layer"     = "gold"
+        }
+      ~ terraform_labels                = {
+          + "component" = "dbt"
+          + "env"       = "dev"
+          + "group"     = "g07"
+          + "layer"     = "gold"
+        }
+        # (18 unchanged attributes hidden)
+
+        # (4 unchanged blocks hidden)
+    }
+
+  # google_bigquery_dataset.silver will be updated in-place
+  ~ resource "google_bigquery_dataset" "silver" {
+      ~ effective_labels                = {
+          + "component" = "dbt"
+          + "env"       = "dev"
+          + "group"     = "g07"
+          + "layer"     = "silver"
+        }
+        id                              = "projects/data-engineering-i1/datasets/g07_silver"
+      ~ labels                          = {
+          + "component" = "dbt"
+          + "layer"     = "silver"
+        }
+      ~ terraform_labels                = {
+          + "component" = "dbt"
+          + "env"       = "dev"
+          + "group"     = "g07"
+          + "layer"     = "silver"
+        }
+        # (18 unchanged attributes hidden)
+
+        # (4 unchanged blocks hidden)
+    }
+
+  # google_bigquery_dataset.warehouse will be updated in-place
+  ~ resource "google_bigquery_dataset" "warehouse" {
+      ~ effective_labels                = {
+          + "component" = "warehouse"
+          + "env"       = "dev"
+          - "step"      = "l04" -> null
+            # (2 unchanged elements hidden)
+        }
+        id                              = "projects/data-engineering-i1/datasets/g07_warehouse"
+      ~ labels                          = {
+          + "component" = "warehouse"
+          - "group"     = "g07" -> null
+          - "step"      = "l04" -> null
+            # (1 unchanged element hidden)
+        }
+      ~ terraform_labels                = {
+          + "component" = "warehouse"
+          + "env"       = "dev"
+          - "step"      = "l04" -> null
+            # (2 unchanged elements hidden)
+        }
+        # (18 unchanged attributes hidden)
+
+        # (8 unchanged blocks hidden)
+    }
+
+  # google_bigquery_dataset_iam_member.warehouse_readers["user:<anas>"] must be replaced
+  # (moved from google_bigquery_dataset_iam_member.warehouse_writers["user:<anas>"])
+-/+ resource "google_bigquery_dataset_iam_member" "warehouse_readers" {
+      + etag       = (known after apply)
+      ~ id         = "projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:<anas>" -> (known after apply)
+      ~ project    = "data-engineering-i1" -> (known after apply)
+      ~ role       = "roles/bigquery.dataEditor" -> "roles/bigquery.dataViewer" # forces replacement
+        # (2 unchanged attributes hidden)
+    }
+
+  # google_bigquery_dataset_iam_member.warehouse_readers["user:<luna>"] must be replaced
+  # (moved from google_bigquery_dataset_iam_member.warehouse_writers["user:<luna>"])
+-/+ resource "google_bigquery_dataset_iam_member" "warehouse_readers" {
+      + etag       = (known after apply)
+      ~ id         = "projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:<luna>" -> (known after apply)
+      ~ project    = "data-engineering-i1" -> (known after apply)
+      ~ role       = "roles/bigquery.dataEditor" -> "roles/bigquery.dataViewer" # forces replacement
+        # (2 unchanged attributes hidden)
+    }
+
+  # google_bigquery_dataset_iam_member.warehouse_readers["user:<malek>"] must be replaced
+  # (moved from google_bigquery_dataset_iam_member.warehouse_writers["user:<malek>"])
+-/+ resource "google_bigquery_dataset_iam_member" "warehouse_readers" {
+      + etag       = (known after apply)
+      ~ id         = "projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:<malek>" -> (known after apply)
+      ~ project    = "data-engineering-i1" -> (known after apply)
+      ~ role       = "roles/bigquery.dataEditor" -> "roles/bigquery.dataViewer" # forces replacement
+        # (2 unchanged attributes hidden)
+    }
+
+  # google_bigquery_dataset_iam_member.warehouse_readers["user:<omar>"] must be replaced
+  # (moved from google_bigquery_dataset_iam_member.warehouse_writers["user:<omar>"])
+-/+ resource "google_bigquery_dataset_iam_member" "warehouse_readers" {
+      + etag       = (known after apply)
+      ~ id         = "projects/data-engineering-i1/datasets/g07_warehouse/roles/bigquery.dataEditor/user:<omar>" -> (known after apply)
+      ~ project    = "data-engineering-i1" -> (known after apply)
+      ~ role       = "roles/bigquery.dataEditor" -> "roles/bigquery.dataViewer" # forces replacement
+        # (2 unchanged attributes hidden)
+    }
+
+  # google_data_catalog_policy_tag.pii_contact will be imported
+    resource "google_data_catalog_policy_tag" "pii_contact" {
+        child_policy_tags = []
+        deletion_policy   = "DELETE"
+        description       = "Directly identifying contact data (street address, phone). Lives only in Bronze today, where it cannot be enforced."
+        display_name      = "pii-contact"
+        id                = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680"
+        name              = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680"
+        parent_policy_tag = null
+        taxonomy          = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651"
+    }
+
+  # google_data_catalog_policy_tag.pii_identifier will be imported
+    resource "google_data_catalog_policy_tag" "pii_identifier" {
+        child_policy_tags = []
+        deletion_policy   = "DELETE"
+        description       = "A key that points at one person (buyer_id, customer_id, session_id). Pseudonymous, still personal data under GDPR."
+        display_name      = "pii-identifier"
+        id                = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+        name              = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+        parent_policy_tag = null
+        taxonomy          = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.contact_readers["user:<anas>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "contact_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<anas>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.contact_readers["user:<emile>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "contact_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<emile>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.contact_readers["user:<luna>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "contact_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<luna>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.contact_readers["user:<malek>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "contact_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<malek>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.contact_readers["user:<omar>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "contact_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<omar>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.identifier_readers["user:<anas>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "identifier_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<anas>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.identifier_readers["user:<emile>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "identifier_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<emile>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.identifier_readers["user:<luna>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "identifier_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<luna>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.identifier_readers["user:<malek>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "identifier_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<malek>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_policy_tag_iam_member.identifier_readers["user:<omar>"] will be created
+  + resource "google_data_catalog_policy_tag_iam_member" "identifier_readers" {
+      + etag       = (known after apply)
+      + id         = (known after apply)
+      + member     = "user:<omar>"
+      + policy_tag = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+      + role       = "roles/datacatalog.categoryFineGrainedReader"
+    }
+
+  # google_data_catalog_taxonomy.g07 will be imported
+    resource "google_data_catalog_taxonomy" "g07" {
+        activated_policy_types = [
+            "FINE_GRAINED_ACCESS_CONTROL",
+        ]
+        deletion_policy        = "DELETE"
+        description            = "Group 7 column classes (Step 10). Shared project: prefixed g07. Owner: group 7, docs/governance.md."
+        display_name           = "g07-marketplace-classification"
+        id                     = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651"
+        name                   = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651"
+        project                = "data-engineering-i1"
+        region                 = "europe-west1"
+    }
+
+  # google_storage_bucket.bronze will be updated in-place
+  ~ resource "google_storage_bucket" "bronze" {
+      ~ effective_labels            = {
+          - "application" = "albert-marketplace" -> null
+          + "component"   = "ingestion"
+          + "env"         = "dev"
+          + "group"       = "g07"
+          - "managed-by"  = "python" -> null
+            # (1 unchanged element hidden)
+        }
+        id                          = "data-engineering-i1-marketplace-group"
+      ~ labels                      = {
+          - "application" = "albert-marketplace" -> null
+          + "component"   = "ingestion"
+          - "managed-by"  = "python" -> null
+            # (1 unchanged element hidden)
+        }
+        name                        = "data-engineering-i1-marketplace-group"
+      ~ terraform_labels            = {
+          - "application" = "albert-marketplace" -> null
+          + "component"   = "ingestion"
+          + "env"         = "dev"
+          + "group"       = "g07"
+          - "managed-by"  = "python" -> null
+            # (1 unchanged element hidden)
+        }
+        # (15 unchanged attributes hidden)
+
+        # (5 unchanged blocks hidden)
+    }
+
+Plan: 3 to import, 14 to add, 5 to change, 4 to destroy.
+
+Changes to Outputs:
+  + policy_tag_pii_contact    = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680"
+  + policy_tag_pii_identifier = "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+
+─────────────────────────────────────────────────────────────────────────────
+
+Note: You didn't use the -out option to save this plan, so Terraform can't
+guarantee to take exactly these actions if you run "terraform apply" now.
