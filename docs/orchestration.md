@@ -338,5 +338,7 @@ A rerun of a day changes nothing in gold, as the idempotency table says.
 On 2026-11-22 the transform default moved to `omara11/group7-transform:2026-11-22-c565e73`, built by Omar from commit
 `c565e73` (digest `sha256:ebbea9ef3cd7d2e5cf490a2d00f107bfc94004856cb9e7ebbc72662c8c971ba8`). It adds `selectors.yml`, which the DAG's
 `--selector` needs, and the `buyer_id` policy tag (Step 10). Omar checked it offline with
-`dbt ls`. **It has not yet run against BigQuery:** the first DAG run on it is the check.
+`dbt ls`. Anas then ran the DAG on it the same day: two runs green, `PASS=56 WARN=1 ERROR=0`
+(the 57-node daily selector), and `buyer_id` kept its policy tag through the rebuild
+([dag-run-new-image.txt](evidence/step10/dag-run-new-image.txt)).
 The ingestion image is unchanged.

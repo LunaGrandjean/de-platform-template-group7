@@ -311,7 +311,7 @@ Checked before opening: `tests/test_warehouse.py` 12 passed, `dbt ls` 103 nodes 
 
 | Open item | Owner | Blocks |
 |---|---|---|
-| One DAG run on the new transform image `2026-11-22-c565e73` (built by Omar, `TRANSFORM_IMAGE` bumped) | the team | Merging: the image passed `dbt ls` offline, but the daily selector and the `buyer_id` policy tag have not run against BigQuery yet |
+| ~~One DAG run on the new transform image `2026-11-22-c565e73`~~ **done 2026-11-22**: two runs green, `PASS=56 WARN=1 ERROR=0`, `buyer_id` still tagged after the rebuild ([evidence](docs/evidence/step10/dag-run-new-image.txt)) | Anas | nothing |
 | `terraform apply` of the labels (plan: 0 add, 5 change, 0 destroy) | Emile | Labels on the bucket and datasets; needs Terraform 1.17 and the team's go-ahead |
 | Billing account ID and project number | Course admin | Creating the budget (`count = 0` until then) |
 
