@@ -1,0 +1,22 @@
+DAG run on the transform image omara11/group7-transform:2026-11-22-c565e73
+Run 2026-11-22 by Anas, local Airflow (orchestration/compose.yaml), G07_GATE=lock.
+
+$ airflow dags list-runs marketplace_daily
+run_id                               | state   | logical_date (period)     | start (UTC)     | end (UTC)
+backfill__2026-09-26T00:00:00+00:00  | success | 2026-09-25T00:00:00+00:00 | 14:52:23        | 14:55:14
+scheduled__2026-11-22T00:00:00+00:00 | success | 2026-11-21T00:00:00+00:00 | 14:52:07        | 14:55:16
+
+Tasks, both runs: extract_orders success, create_bronze_table success, dbt_build success.
+
+dbt_build log, both runs (image group7-transform:2026-11-22-c565e73, --selector daily):
+Done. PASS=56 WARN=1 ERROR=0 SKIP=0
+(57 nodes = the daily selector; the warning is not_null_dim_product_p_name, by design)
+
+g07_gold.fct_order_items after the runs (read with the pipeline's credentials):
+modified  2026-11-22 14:55:04 UTC   (rebuilt by the run)
+rows      208,422                   (unchanged)
+buyer_id  policy tag projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260
+
+Note: the local source database was freshly restored from the release dump, whose last
+order_date is 2026-09-14, so both periods extracted 0 orders. The run proves the image,
+the daily selector and the policy tag on a rebuild; it adds no new days to gold.

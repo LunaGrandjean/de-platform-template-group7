@@ -277,3 +277,11 @@ The listing command is:
 - This ran on the same machine that built the image, with its other images present. The
   stronger test is for a teammate who has never built it to run step 4 on their machine
   and compare the digest with the one above.
+
+## Later images
+
+The DAG's current transform image, for reference. It was pushed the same way and not reproduced here.
+
+| Reference | Commit | Digest | Pushed |
+|---|---|---|---|
+| `omara11/group7-transform:2026-11-22-c565e73` | `c565e73` | `sha256:ebbea9ef3cd7d2e5cf490a2d00f107bfc94004856cb9e7ebbc72662c8c971ba8` | 2026-11-22, by Omar |

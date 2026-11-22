@@ -49,10 +49,14 @@ import {
   id = "${local.ds_iam}/g07_warehouse roles/bigquery.dataOwner ${local.bronze_owner}"
 }
 
-import {
-  for_each = toset(local.warehouse_users)
-  to       = google_bigquery_dataset_iam_member.warehouse_writers[each.value]
-  id       = "${local.ds_iam}/g07_warehouse roles/bigquery.dataEditor ${each.value}"
+# Step 10, the narrowed grant: warehouse_writers (dataEditor, already in state
+# since the Step 8 apply) is renamed warehouse_readers, which says dataViewer.
+# role forces replacement, so the plan shows -/+ for each member: the dataEditor
+# binding destroyed, a dataViewer one created. That replace IS the narrowing, in
+# one apply, with nothing done by hand.
+moved {
+  from = google_bigquery_dataset_iam_member.warehouse_writers
+  to   = google_bigquery_dataset_iam_member.warehouse_readers
 }
 
 import {
@@ -72,4 +76,22 @@ import {
   for_each = var.create_service_account && var.import_service_account ? toset(["g07-pipeline"]) : toset([])
   to       = google_service_account.pipeline[0]
   id       = "projects/${var.project_id}/serviceAccounts/${each.value}@${var.project_id}.iam.gserviceaccount.com"
+}
+
+# Step 10: the taxonomy and its two tags were created through the API on
+# 2026-11-20 (docs/evidence/step10/taxonomy-created.json), because apply needs
+# Terraform 1.17. The next apply adopts them instead of creating duplicates.
+import {
+  to = google_data_catalog_taxonomy.g07
+  id = "projects/${var.project_id}/locations/${var.region}/taxonomies/839634828442859651"
+}
+
+import {
+  to = google_data_catalog_policy_tag.pii_identifier
+  id = "projects/${var.project_id}/locations/${var.region}/taxonomies/839634828442859651/policyTags/2241334323157841260"
+}
+
+import {
+  to = google_data_catalog_policy_tag.pii_contact
+  id = "projects/${var.project_id}/locations/${var.region}/taxonomies/839634828442859651/policyTags/1875540059977754680"
 }

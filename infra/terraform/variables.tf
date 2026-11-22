@@ -32,6 +32,59 @@ variable "import_service_account" {
   default     = false
 }
 
+variable "env" {
+  description = "Label `env` on every resource. One environment today; the key exists so a future prod is never read as dev."
+  type        = string
+  default     = "dev"
+
+  validation {
+    condition     = contains(["dev", "prod"], var.env)
+    error_message = "env is dev or prod."
+  }
+}
+
+variable "billing_account_id" {
+  description = <<-EOT
+    Billing account behind data-engineering-i1, as XXXXXX-XXXXXX-XXXXXX. Empty
+    means the budget and its notification channel are declared but not created:
+    the Cloud Billing API is disabled in the shared project and our identities
+    cannot read the account (checked 2026-11-19, docs/costs.md). The course admin
+    supplies it, or creates the budget from this definition.
+  EOT
+  type        = string
+  default     = ""
+}
+
+variable "project_number" {
+  description = "Numeric id of data-engineering-i1, needed by the budget filter. Only read when billing_account_id is set."
+  type        = string
+  default     = ""
+}
+
+variable "budget_amount" {
+  description = "Monthly budget for spend labelled group=g07, in the billing account's currency."
+  type        = number
+  default     = 10
+}
+
+variable "budget_alert_email" {
+  description = "The one person the budget alert reaches. A person who can act, never a shared inbox."
+  type        = string
+  default     = "amohamed@albertschool.com"
+}
+
+variable "pii_readers" {
+  description = "Who may read columns tagged pii-identifier or pii-contact: the engineer row of the access matrix (docs/governance.md)."
+  type        = list(string)
+  default = [
+    "user:amohamed@albertschool.com",
+    "user:egadenne@albertschool.com",
+    "user:lgrandjean@albertschool.com",
+    "user:msaoudi@albertschool.com",
+    "user:oabdellatif@albertschool.com",
+  ]
+}
+
 variable "dataset_readers" {
   description = "Group members with read access to g07_bronze."
   type        = list(string)

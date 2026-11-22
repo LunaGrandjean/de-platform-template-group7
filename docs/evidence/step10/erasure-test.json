@@ -1,0 +1,121 @@
+{
+ "at_utc": "2026-11-21T18:13:03+00:00",
+ "identifier": "one buyer_id from the Step 7 scheduled extract only (1 order, 2 lines, no address); the id is not recorded here",
+ "found_before": {
+  "bronze_files": 6,
+  "rows_per_file": [
+   1,
+   1,
+   1,
+   1,
+   1,
+   2
+  ],
+  "warehouse.orders": 0,
+  "gold.fct_order_items": 2,
+  "silver.int_order_lines": 2,
+  "find_seconds": 10.0
+ },
+ "bronze_rewrites": [
+  {
+   "object": "bronze/scheduled/orders/interval_date=2026-09-23/load_id=20261116T182742158783Z/part-0.parquet",
+   "rows_before": 243,
+   "rows_removed": 1,
+   "rows_after": 242,
+   "generation_before": 1794853666605191,
+   "generation_after": 1795284676891312,
+   "seconds": 0.58
+  },
+  {
+   "object": "bronze/scheduled/orders/interval_date=2026-09-23/load_id=20261117T162655908663Z/part-0.parquet",
+   "rows_before": 243,
+   "rows_removed": 1,
+   "rows_after": 242,
+   "generation_before": 1794932820311843,
+   "generation_after": 1795284677144965,
+   "seconds": 0.25
+  },
+  {
+   "object": "bronze/scheduled/orders/interval_date=2026-09-23/load_id=20261116T181236603229Z/part-0.parquet",
+   "rows_before": 243,
+   "rows_removed": 1,
+   "rows_after": 242,
+   "generation_before": 1794852758418526,
+   "generation_after": 1795284677369335,
+   "seconds": 0.22
+  },
+  {
+   "object": "bronze/scheduled/order_items/interval_date=2026-09-23/load_id=20261117T162655908663Z/part-0.parquet",
+   "rows_before": 426,
+   "rows_removed": 2,
+   "rows_after": 424,
+   "generation_before": 1794932820209874,
+   "generation_after": 1795284677604287,
+   "seconds": 0.24
+  },
+  {
+   "object": "bronze/cdc/orders/ingestion_date=2026-11-05/d43775ed97774a3eb22f1986d14b220e.parquet",
+   "rows_before": 2242,
+   "rows_removed": 1,
+   "rows_after": 2241,
+   "generation_before": 1793894030370602,
+   "generation_after": 1795284677902078,
+   "seconds": 0.29
+  },
+  {
+   "object": "bronze/cdc/order_items/ingestion_date=2026-11-05/5364b78475944d6bbd85e352c7e296ed.parquet",
+   "rows_before": 3516,
+   "rows_removed": 1,
+   "rows_after": 3515,
+   "generation_before": 1793894081534338,
+   "generation_after": 1795284678213864,
+   "seconds": 0.31
+  }
+ ],
+ "after": {
+  "bronze.scheduled_orders": 0,
+  "bronze.scheduled_order_items": 0,
+  "bronze.cdc.orders": 0,
+  "bronze.cdc.order_items": 0,
+  "bronze.cdc.review": 0,
+  "bronze.cdc.customer_shipping": 0,
+  "warehouse.orders": 0,
+  "silver.int_order_lines": 0,
+  "gold.fct_order_items": 0
+ },
+ "after_job_ids": {
+  "sched_o": "5bffd8a6-b393-4861-8f13-25c71728ce1e",
+  "sched_i": "3d7ff9f4-08b3-4abf-85f7-038fc075a0bd",
+  "cdc_o": "260577ad-40aa-4d48-a8f6-05be99a9ffa4",
+  "cdc_i": "05732099-1093-484c-8aea-8f1b8d53ca25",
+  "cdc_r": "e6293780-311b-4210-a1e3-c74f99cbe43f",
+  "cdc_c": "24af5e34-5561-4b9d-9bc0-98e93356f95b",
+  "wh": "b73d4e41-8dba-4915-bc82-5240fa7d6e2c",
+  "silver": "9de40846-7c43-4784-a86f-090e8e2582e8",
+  "gold": "a3a9436f-5161-4947-aa3e-4c053ee3ebda",
+  "count_fct_order_items": "a81a5ba6-8244-4c77-9a7b-394b87ccf0d9",
+  "count_fct_daily_demand": "e3ab08ac-70ae-4ec3-9e9b-8363e2ef4b09",
+  "count_dim_product": "c3486625-8884-4354-aef6-914b3bf77562",
+  "count_dim_country": "3f39d374-441d-4301-bb56-10119e61fd20",
+  "count_dim_date": "88fbfa46-405f-4361-8206-a8bcf81af545",
+  "count_sched": "42e8c669-1ae6-4508-bc6d-c283db068f6b"
+ },
+ "gold_counts_before": {
+  "fct_order_items": 208424,
+  "fct_daily_demand": 207543,
+  "dim_product": 42858,
+  "dim_country": 7,
+  "dim_date": 1461,
+  "fct_order_items_scheduled": 4144
+ },
+ "gold_counts_after": {
+  "fct_order_items": 208422,
+  "fct_daily_demand": 207541,
+  "dim_product": 42858,
+  "dim_country": 7,
+  "dim_date": 1461,
+  "fct_order_items_scheduled": 4142
+ },
+ "gold_buyer_id_still_tagged": true,
+ "throwaway_tables_dropped": true
+}

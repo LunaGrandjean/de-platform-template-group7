@@ -1,0 +1,497 @@
+{
+  "what": "AFTER: dbt build --selector daily, run once on 2026-11-19 22:56 UTC from transform/ by Anas Mossad (same dbt 1.12.6 and uv.lock as the 2026-11-17-e8df6e5 image; transform code unchanged except the Step 9 tags, selector and labels)",
+  "dbt_invocation_id": "ae05596e-c4c5-4ab8-a7b4-1c4b22c1bcf9",
+  "result": "PASS=56 WARN=1 ERROR=0 (the warning is not_null_dim_product_p_name: the 6 known unnamed products, warn_if >0, error_if >6)",
+  "jobs": 58,
+  "bytes_billed": 809500672,
+  "bytes_processed": 207571539,
+  "mib_billed": 772.0,
+  "mib_processed": 198.0,
+  "before_2026_11_17": {
+    "jobs": 104,
+    "mib_billed": 1215.0,
+    "mib_processed": 364.2
+  },
+  "every_job_labelled_group_g07": true,
+  "gold_row_counts_after": {
+    "fct_order_items": 208424,
+    "fct_daily_demand": 207543,
+    "dim_product": 42858,
+    "dim_country": 7,
+    "dim_date": 1461
+  },
+  "gold_row_counts_note": "Identical to before the change (storage-inventory.json, read the same day before the run).",
+  "label_bug_found": {
+    "what": "dbt replaced the project-level +labels with the folder-level ones instead of merging: after this run the 5 gold tables carried only layer=gold, losing group=g07",
+    "fix": "all four keys repeated per folder in dbt_project.yml, then dbt run --selector full (models only) at 22:58 UTC",
+    "fix_run_jobs": 21,
+    "fix_run_mib_billed": 112.0,
+    "verified": "15 silver views and 5 gold tables carry group=g07, env=dev, layer, component=dbt"
+  },
+  "jobs_detail": [
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.kafka_clickstream"
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": ""
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 10485760,
+      "processed": 1654345,
+      "referenced_tables": "g07_bronze.shipping_details"
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 31457280,
+      "processed": 10006600,
+      "referenced_tables": "g07_bronze.product g07_bronze.product_reviews g07_bronze.review"
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.python_orders"
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": ""
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2029323,
+      "referenced_tables": "g07_bronze.kafka_clickstream"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.kafka_clickstream"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1573776,
+      "referenced_tables": "g07_bronze.kafka_clickstream"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.python_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1803048,
+      "referenced_tables": "g07_bronze.python_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 41496,
+      "referenced_tables": "g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 41496,
+      "referenced_tables": "g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 33,
+      "referenced_tables": "g07_gold.dim_country"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 33,
+      "referenced_tables": "g07_gold.dim_country"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 514296,
+      "referenced_tables": "g07_gold.dim_product"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 5020687,
+      "referenced_tables": "g07_gold.dim_product"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 342864,
+      "referenced_tables": "g07_gold.dim_product"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 514296,
+      "referenced_tables": "g07_gold.dim_product"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 11688,
+      "referenced_tables": "g07_gold.dim_date"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 11688,
+      "referenced_tables": "g07_gold.dim_date"
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 124456,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 41496,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 124456,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 41496,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 141048,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 116176,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_VIEW",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 0,
+      "processed": 0,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 41943040,
+      "processed": 32738401,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders"
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 62914560,
+      "processed": 48267552,
+      "referenced_tables": "g07_bronze.customer_shipping g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders g07_bronze.shipping_details"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2088384,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 3334784,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 31457280,
+      "processed": 5663800,
+      "referenced_tables": "g07_bronze.scheduled_order_items g07_bronze.scheduled_orders g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1667392,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1667392,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 834046,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 4168480,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2088384,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1667392,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2501088,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 834079,
+      "referenced_tables": "g07_gold.dim_country g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 1679080,
+      "referenced_tables": "g07_gold.dim_date g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 3015384,
+      "referenced_tables": "g07_gold.dim_product g07_gold.fct_order_items"
+    },
+    {
+      "resource": "model",
+      "node": null,
+      "statement": "CREATE_TABLE_AS_SELECT",
+      "billed": 12582912,
+      "processed": 11672094,
+      "referenced_tables": "g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 4981382,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 62914560,
+      "processed": 32415295,
+      "referenced_tables": "g07_bronze.order_items g07_bronze.orders g07_bronze.scheduled_order_items g07_bronze.scheduled_orders g07_gold.fct_daily_demand g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 9983208,
+      "referenced_tables": "g07_gold.fct_daily_demand g07_gold.fct_order_items"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1660344,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 1660344,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 2490516,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 10485760,
+      "processed": 830522,
+      "referenced_tables": "g07_gold.fct_daily_demand"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 1672032,
+      "referenced_tables": "g07_gold.dim_date g07_gold.fct_daily_demand"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 830555,
+      "referenced_tables": "g07_gold.dim_country g07_gold.fct_daily_demand"
+    },
+    {
+      "resource": "test",
+      "node": null,
+      "statement": "SELECT",
+      "billed": 20971520,
+      "processed": 3004812,
+      "referenced_tables": "g07_gold.dim_product g07_gold.fct_daily_demand"
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+ "at_utc": "2026-11-20T18:40:52+00:00",
+ "table": "data-engineering-i1.g07_bronze.shipping_details",
+ "table_type": "EXTERNAL",
+ "columns": [
+  "phone",
+  "street_address"
+ ],
+ "policy_tag": "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/1875540059977754680",
+ "result": "refused",
+ "error": "BadRequest: PATCH https://bigquery.googleapis.com/bigquery/v2/projects/data-engineering-i1/datasets/g07_bronze/tables/shipping_details?prettyPrint=false: Policy tags are not supported on plain external tables. Use a BigLake table instead."
+}

@@ -16,18 +16,61 @@ clean-targets: ["target", "dbt_packages"]
 # the two share no order_id, so each order has exactly one origin.
 vars:
   scheduled_orders_from: "2026-09-15"
+  # Step 10: the pii-identifier policy tag (infra/terraform/governance.tf, output
+  # policy_tag_pii_identifier). Columns carrying it are readable only by its
+  # fine-grained readers (docs/governance.md).
+  g07_pii_identifier_tag: "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+
+# Step 9: every BigQuery job dbt runs carries the group's label convention
+# (docs/costs.md). Query cost is attributed by the labels on the JOB, not on the
+# table it reads, so labelling the datasets alone would leave the largest cost
+# line (BigQuery analysis) unattributed. job-label turns the JSON comment from
+# macros/g07_query_comment.sql into job labels.
+query-comment:
+  comment: "{{ g07_query_comment(node) }}"
+  job-label: true
 
 models:
   albert_marketplace:
-    +labels:
-      group: g07
-      step: l05
+    # Same convention as infra/terraform/labels.tf, on every table and view.
+    # All four keys are repeated per folder: dbt REPLACES +labels set higher up
+    # instead of merging them (found on 2026-11-19, when gold came out with
+    # `layer` only).
     staging:
       +materialized: view
       +schema: silver
+      +labels:
+        group: g07
+        env: "{{ target.name }}"
+        layer: silver
+        component: dbt
+      # frozen_snapshot: reads only the Step 2 snapshot (load
+      # 20261026T105159Z-2efcb86a), which never changes. The daily selector
+      # (selectors.yml) skips the tests that only touch these models; the weekly
+      # full build and any change to transform/ still run them.
+      stg_orders: {+tags: [frozen_snapshot]}
+      stg_order_items: {+tags: [frozen_snapshot]}
+      stg_product: {+tags: [frozen_snapshot]}
+      stg_review: {+tags: [frozen_snapshot]}
+      stg_product_reviews: {+tags: [frozen_snapshot]}
+      stg_customer_shipping: {+tags: [frozen_snapshot]}
+      stg_shipping_details: {+tags: [frozen_snapshot]}
     intermediate:
       +materialized: view
       +schema: silver
+      +labels:
+        group: g07
+        env: "{{ target.name }}"
+        layer: silver
+        component: dbt
+      int_orders_deduplicated: {+tags: [frozen_snapshot]}
+      int_buyer_country: {+tags: [frozen_snapshot]}
+      int_product_review_stats: {+tags: [frozen_snapshot]}
     marts:
       +materialized: table
       +schema: gold
+      +labels:
+        group: g07
+        env: "{{ target.name }}"
+        layer: gold
+        component: dbt

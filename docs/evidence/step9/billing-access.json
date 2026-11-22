@@ -1,0 +1,8 @@
+{
+  "checked_at": "2026-11-19",
+  "identity": "amohamed@albertschool.com (Application Default Credentials)",
+  "cloudbilling.projects.getBillingInfo": 403,
+  "reason": "SERVICE_DISABLED: Cloud Billing API not enabled in data-engineering-i1",
+  "cloudresourcemanager.testIamPermissions": 403,
+  "billing_export_dataset_found": false
+}

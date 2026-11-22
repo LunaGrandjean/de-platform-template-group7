@@ -23,4 +23,17 @@ terraform {
 provider "google" {
   project = var.project_id
   region  = var.region
+
+  # Step 9 label convention (docs/costs.md): `group` and `env` are the same on
+  # every resource, so the provider stamps them on everything that takes labels.
+  # Each resource adds its own `layer` and `component`. A resource-level label
+  # with the same key wins over these.
+  default_labels = local.default_labels
+
+  # Step 9 review (PR #9): with user credentials (ADC), the Billing Budgets API
+  # needs a quota project, or google_billing_budget fails. These two lines send
+  # every API call's quota and billing to our own project; per the provider docs
+  # for google_billing_budget. No effect on resources, only on how calls are made.
+  billing_project       = var.project_id
+  user_project_override = true
 }

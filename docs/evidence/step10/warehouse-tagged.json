@@ -1,0 +1,15 @@
+{
+ "at_utc": "2026-11-20T18:41:15+00:00",
+ "table": "data-engineering-i1.g07_warehouse.orders",
+ "table_type": "TABLE",
+ "columns": [
+  "buyer_id"
+ ],
+ "policy_tag": "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260",
+ "result": "tagged",
+ "schema_now": {
+  "buyer_id": [
+   "projects/data-engineering-i1/locations/europe-west1/taxonomies/839634828442859651/policyTags/2241334323157841260"
+  ]
+ }
+}
