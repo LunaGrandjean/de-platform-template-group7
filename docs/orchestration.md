@@ -15,7 +15,7 @@ extract_orders  ->  create_bronze_table  ->  dbt_build   (the quality gate)
 | Task | Runs | Does |
 |---|---|---|
 | `extract_orders` | `omara11/group7-ingestion:2026-11-17-e8df6e5` | orders whose `order_date` is in the run's period, and their lines, from the source database to `bronze/scheduled/order_items/` and `bronze/scheduled/orders/` |
-| `create_bronze_table` | `omara11/group7-transform:2026-11-17-e8df6e5` | `dbt run-operation create_scheduled_orders_table`: the two external tables over those paths |
+| `create_bronze_table` | `omara11/group7-transform:2026-11-22-c565e73` | `dbt run-operation create_scheduled_orders_table`: the two external tables over those paths |
 | `dbt_build` | the same transform image | `dbt build`: every model, each tested as it is built |
 
 - **Every task is a `DockerOperator`** running a Step 6 image beside Airflow, through the
@@ -334,3 +334,9 @@ Runs 1 to 3 used local builds of commit `71219f3`. The published images,
 (the same code plus the Step 6 review fix, `uv sync --locked`), are the DAG's defaults. The
 24 Sep run was cleared and rerun on them: all three tasks green, `PASS=102 WARN=1 ERROR=0`.
 A rerun of a day changes nothing in gold, as the idempotency table says.
+
+On 2026-11-22 the transform default moved to `omara11/group7-transform:2026-11-22-c565e73`, built by Omar from commit
+`c565e73` (digest `sha256:ebbea9ef3cd7d2e5cf490a2d00f107bfc94004856cb9e7ebbc72662c8c971ba8`). It adds `selectors.yml`, which the DAG's
+`--selector` needs, and the `buyer_id` policy tag (Step 10). Omar checked it offline with
+`dbt ls`. **It has not yet run against BigQuery:** the first DAG run on it is the check.
+The ingestion image is unchanged.
