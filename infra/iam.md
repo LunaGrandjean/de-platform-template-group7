@@ -4,7 +4,9 @@
 > Terraform, and the named grants on the `g07_*` datasets are declared in
 > [`terraform/iam.tf`](terraform/iam.tf) ([`docs/infra.md`](../docs/infra.md)).
 > The bucket has no named grant yet: the project default bindings below are
-> still the only ones, still outside Terraform, and narrowing them is Step 10.
+> still outside Terraform. Step 10 narrowed the four named warehouse grants
+> (Émile's 2026-11-22 confirmation), not these inherited bucket bindings.
+> See [current status](../docs/project-status.md) for the admin work remaining.
 
 Verified on 2026-10-26 using the Google Cloud Storage Python SDK, run with
 `uv`. Bucket: `gs://data-engineering-i1-marketplace-group`; project:

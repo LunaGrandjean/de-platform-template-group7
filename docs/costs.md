@@ -90,6 +90,13 @@ revisit file sizes, refresh frequency and long-term retention.
 
 # Step 9: attributable, and one saving measured
 
+**Deployment update, 2026-11-23:** Émile confirmed the combined Step 9 + 10
+Terraform apply on 2026-11-22: labels on the Bronze bucket and four datasets,
+with no changes in the follow-up plan. The apply and final plan transcripts
+are still to be attached ([project status](project-status.md#terraform-apply)).
+The budget was not activated. The measured costs below retain their original
+dates and are not a fresh billing-account verification.
+
 Measured on **2026-11-19** by Anas Mossad. Prices: Belgium (`europe-west1`) list
 prices read on 2026-11-19 ([pricing evidence](evidence/step9/pricing-2026-11-19.json)),
 USD before tax and credits. Every figure below says whether it was measured
@@ -184,9 +191,11 @@ Cloud Billing API is disabled in `data-engineering-i1`, and our identities get
 account ID nor create a budget on it. The resources have `count = 0` until
 `billing_account_id` is set. Asked of the course admin: either the account ID
 plus `billing.budgets.create`, or creating the same budget from `budget.tf`.
-Until then the only alarm is the course's own project budget, which reaches
-the admin, not us. Even once created, it only counts spend from 2026-11-19 on,
-because labels apply forward.
+The combined 2026-11-22 apply did not activate these budget resources. No group
+budget notification to Anas has been demonstrated. Any course-level budget is
+controlled by the admin; this repository does not verify its delivery. Once
+created, the group budget can attribute only labelled spend; labels apply
+forward and never repair historical billing lines.
 
 ## 3. Where the numbers come from
 

@@ -1,7 +1,7 @@
 # ADR 0001: Use a two-tier lake and warehouse architecture
 
 - Date: 2026-10-26
-- Status: Proposed for group review
+- Status: Accepted; implemented through the subsequent reviewed project steps
 - Author: Luna Grandjean
 - Scope: Target design for the course data platform; no deployment asserted
 

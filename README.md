@@ -2,8 +2,8 @@
 
 This is our group's data platform for Albert's Marketplace, a fictional European
 beauty-products marketplace used in the Data Engineering & Cloud Infrastructure
-course at Albert School. Steps 1 and 2 document the platform design and establish
-the raw Bronze layer in Google Cloud Storage.
+course at Albert School. Steps 1 to 10 cover the GCS Bronze lake, BigQuery and
+dbt models, container images, Airflow, Terraform, costs and governance.
 
 The repository also includes the provided marketplace source system: its
 operational PostgreSQL database, storefront and generators for historical data
@@ -17,9 +17,18 @@ copies. See [`docs/dataset-card.md`](docs/dataset-card.md).
 
 ## Student data platform
 
-The course platform documentation is developed on branch `Luna`. The source
-system below provides its PostgreSQL data, released CSV extracts and Kafka
-events. The platform targets daily units sold by product and country.
+The platform code and documentation for Steps 1 to 10 are merged into `main`.
+The source system below provides PostgreSQL data, released CSV extracts and
+Kafka events. The platform reports daily units sold by product and country.
+
+**Status updated 2026-11-23:** Steps 9 and 10 landed together through
+[PR #10](https://github.com/LunaGrandjean/de-platform-template-group7/pull/10)
+into [PR #9](https://github.com/LunaGrandjean/de-platform-template-group7/pull/9),
+then into `main`, preserving the commits. The
+[post-merge Terraform CI](https://github.com/LunaGrandjean/de-platform-template-group7/actions/runs/45054017414)
+passed. Émile confirmed the combined Terraform apply on 2026-11-22.
+See [project status](docs/project-status.md) for the evidence, remaining cloud
+permissions and submission checklist.
 
 ### Team
 
@@ -63,7 +72,7 @@ Step 1 completion checklist:
   `charlestanguypro@gmail.com`, with subject
   `MSA-DAT09-02 | L01-REPO | <cohort> | <group>`.
 - [ ] Have every member push at least one commit.
-- [ ] Merge at least one pull request after another member reviews it.
+- [x] Merge at least one pull request after another member reviews it.
 
 Keep the course repository and its access intact until marks are published.
 Submit changes through reviewed pull requests. Commit history is part of the
@@ -166,6 +175,27 @@ clustering comparisons and deliberate maximum-bytes cap failure are verified.
 | [Evidence](docs/evidence/step4/) | External and native table metadata, job IDs and query measurements |
 | [Dictionary](docs/data-dictionary.md) and [architecture](docs/architecture.md) | Warehouse schemas and updated status |
 
+### Step 5: Silver, Gold and acceptance tests
+
+The dbt project in [`transform/`](transform/) types and reconciles Bronze
+records into Silver views and a Gold star. Each mart declares its grain and
+tests its keys and relationships. From Step 7 onward, sales before 2026-09-15
+come from the reconciled snapshot; later sales come from scheduled orders and
+their lines, joined in `int_order_lines`.
+
+| Deliverable | Content |
+|---|---|
+| [Sources](transform/models/sources.yml) | Snapshot and ingestion sources, with freshness thresholds and their rationale |
+| [Staging](transform/models/staging/) and [intermediate models](transform/models/intermediate/) | Named source defects, duplicate rules, country mapping and scheduled-load reconciliation |
+| [Marts](transform/models/marts/) | Product, date and country dimensions; order-line and daily-demand facts |
+| [Acceptance criteria](docs/acceptance-criteria.md) | Business guarantees linked to their enforcing tests, with dated results and known limits |
+| [Lineage](docs/lineage.md) | Model dependencies and schema-change investigation |
+| [ADR 0005](docs/adr/0005-materialisations.md) | Views for Silver, tables for Gold, and when to reconsider |
+
+The daily selector introduced in Step 9 runs 57 nodes; the full selector keeps
+the snapshot tests in the weekly build. The latest recorded daily runs passed
+56 nodes with one known warning ([evidence](docs/evidence/step10/dag-run-new-image.txt)).
+
 ### Step 6: Container images
 
 Both jobs now run from images that carry their own interpreter, dependencies and code:
@@ -231,13 +261,16 @@ nothing else. Run everything from the repository root.
    Replace `parse` with `source freshness` or `build` to run those. **`build` replaces the
    silver and gold objects in the shared project.**
 
-To pull a pushed image instead of building it, Docker alone is enough. The tag pushed
-so far is `2026-11-12-90355ad`:
+To pull the current DAG images instead of building them, Docker alone is enough:
 
 ```
-docker pull omara11/group7-ingestion:<tag>
-docker pull omara11/group7-transform:<tag>
+docker pull omara11/group7-ingestion:2026-11-17-e8df6e5
+docker pull omara11/group7-transform:2026-11-22-c565e73
 ```
+
+These are the defaults in the [DAG](orchestration/dags/marketplace_daily.py).
+The transform image includes the Step 9 selectors and Step 10 policy tags;
+its digest and the earlier reproduction are in [reproduce.md](docs/reproduce.md).
 
 Things that look wrong and are not:
 
@@ -304,16 +337,17 @@ out of seven brought it to 772 MiB (-36.5%), measured on 2026-11-19 with gold un
 | [ADR 0009](docs/adr/0009-cost-attribution.md) | Labels on resources and jobs over a project per team, tags or a manual split, and what changes at ten teams |
 | [Evidence](docs/evidence/step9/) | Daily bytes, the 11-17 build job by job, storage inventory, prices, label check, selections and the label-only `terraform plan` |
 
-**Delivery.** Commit `3bb044f` on `anas/step9-finops`, rebased on `main` after PR #6
-(Step 8), reviewed in [PR #9](https://github.com/LunaGrandjean/de-platform-template-group7/pull/9).
-Checked before opening: `tests/test_warehouse.py` 12 passed, `dbt ls` 103 nodes in
-`full` and 57 in `daily`, `terraform validate` OK. Still open, and why each one blocks:
+**Delivery.** [PR #9](https://github.com/LunaGrandjean/de-platform-template-group7/pull/9)
+merged into `main` on 2026-11-22 after receiving Step 10 through PR #10.
+The Terraform check passed on the combined branch and again after the merge.
+The original pre-PR checks were `tests/test_warehouse.py` (12 passed),
+`dbt ls` (103 nodes in `full`, 57 in `daily`) and `terraform validate`.
 
-| Open item | Owner | Blocks |
+| Item | Owner | Status |
 |---|---|---|
-| ~~One DAG run on the new transform image `2026-11-22-c565e73`~~ **done 2026-11-22**: two runs green, `PASS=56 WARN=1 ERROR=0`, `buyer_id` still tagged after the rebuild ([evidence](docs/evidence/step10/dag-run-new-image.txt)) | Anas | nothing |
-| `terraform apply` of the labels (plan: 0 add, 5 change, 0 destroy) | Emile | Labels on the bucket and datasets; needs Terraform 1.17 and the team's go-ahead |
-| Billing account ID and project number | Course admin | Creating the budget (`count = 0` until then) |
+| DAG on `2026-11-22-c565e73` | Anas | Done 2026-11-22: two green runs, `PASS=56 WARN=1 ERROR=0`, `buyer_id` still tagged after the rebuild ([evidence](docs/evidence/step10/dag-run-new-image.txt)) |
+| Combined Step 9 + 10 Terraform apply | Émile | Confirmed 2026-11-22: labels on the bucket and four datasets, narrowed warehouse grants, taxonomy imported and tag readers applied; follow-up plan reported no changes ([status and evidence limits](docs/project-status.md#terraform-apply)) |
+| Budget creation and notification | Course admin | Pending: billing account access is required; budget resources remain disabled |
 
 ### Step 10: Classified, restricted, and erasable
 
@@ -337,6 +371,18 @@ are written down, not hidden:
 | [Erasure runbook](docs/runbooks/erasure.md) | Finding a buyer in every layer, the Bronze rewrite, the rebuilds, the copies that survive for 14 days, and the proof. **Run once on 2026-11-21**: one real buyer erased from 6 Bronze files, silver and gold, dbt 102 of 103 passing, and two runbook bugs found and fixed |
 | [ADR 0010](docs/adr/0010-data-classification.md) | Classification over a view per consumer, a dataset per sensitivity level, or trust, and why it is the only one that survives access we cannot remove |
 | [Evidence](docs/evidence/step10/) | Column inventory, 30 days of readers, access before, the Bronze refusal, read checks, reader grants, tags and labels after, the audit-log check, the erasure test |
+
+Émile confirmed the warehouse grant reduction and Terraform adoption of the
+taxonomy and tag readers on 2026-11-22. This does not remove the inherited
+course-wide grants or demonstrate a denied read. See [current status](docs/project-status.md).
+
+### Step 11: Defence preparation
+
+Before submission, link a 5–8 minute video here showing the platform running,
+with every member speaking. Each member must prepare at least two ADRs they
+did not write alone, and the group must rehearse its
+ten-minute pitch. The video link and ADR allocation are still pending; see the
+[submission checklist](docs/project-status.md#submission-and-defence).
 
 ## Start it
 

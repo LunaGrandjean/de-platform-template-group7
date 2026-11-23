@@ -26,3 +26,12 @@ readers ([`governance.tf`](terraform/governance.tf), created through the API and
 adopted by [`imports.tf`](terraform/imports.tf)), and narrowed the warehouse
 grant from dataEditor to dataViewer ([`iam.tf`](terraform/iam.tf)); see
 [`docs/governance.md`](../docs/governance.md).
+
+**Deployment update, 2026-11-23:** Émile confirmed applying Steps 9 and 10
+together on 2026-11-22, checking the labels and narrowed grants in GCP, importing
+the taxonomy and tags, applying the named tag readers, and obtaining a final
+plan with no changes. This operator confirmation is recorded in
+[`docs/project-status.md`](../docs/project-status.md#terraform-apply); its apply
+and final plan output have not been committed. The budget and pipeline
+service account remain disabled pending admin access, and inherited project
+grants still prevent demonstrating a denied student read.

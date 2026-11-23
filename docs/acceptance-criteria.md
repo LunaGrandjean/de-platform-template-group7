@@ -3,17 +3,23 @@
 What must be true for the warehouse to be usable, and the test that checks it.
 The criteria come from the "Acceptance checks for Lesson 5" in
 [the star design](model/star-daily-demand.md), plus the course's standard
-checks. Every test runs in `dbt build`, except where the table says otherwise.
+checks. The full selector runs all model tests; the daily selector skips tests
+tagged `frozen_snapshot` (Step 9). Source freshness remains a separate command.
 
 ```bash
 cd transform
 uv run --locked dbt deps --profiles-dir .
-uv run --locked dbt build --profiles-dir .
+uv run --locked dbt build --selector full --profiles-dir .
 uv run --locked dbt source freshness --profiles-dir .   # freshness is a separate command
 ```
 
-Last full run, 2026-11-06: 86 items, 85 pass, 1 warns (B5, a known source
-defect), 0 fail. Source freshness at the same time: see C1 and C2.
+Step 5 baseline run, 2026-11-06: 86 items, 85 pass, 1 warns (B5, a known source
+defect), 0 fail. Counts and totals in the tables below retain that baseline
+unless another date is stated; they are not current inventory claims.
+The [2026-11-22 daily runs](evidence/step10/dag-run-new-image.txt) completed
+`PASS=56 WARN=1 ERROR=0 SKIP=0` using the daily selector and retained the
+`buyer_id` policy tag. They do not rerun every frozen-snapshot test or source
+freshness. The original freshness results are in C1 and C2.
 
 Test files: [`marts.yml`](../transform/models/marts/marts.yml),
 [`intermediate.yml`](../transform/models/intermediate/intermediate.yml),
@@ -55,8 +61,11 @@ Test files: [`marts.yml`](../transform/models/marts/marts.yml),
 | C2 | Clickstream is no more than 6 hours old (warn) or 24 hours (error), measured on load time. | `dbt source freshness`, `bronze_ingestion.kafka_clickstream`. | **Error**, 32.1 h. Everything was loaded once on 2026-11-05. |
 | C3 | The frozen snapshot has no freshness rule. | None, on purpose. It has no load-time column, and its `load_id` is its version. | Not testable, documented |
 
-C1 and C2 are alerts that are true today, not thresholds bent to pass. They go
-green when the extractor and consumer run on a schedule (Step 7).
+C1 and C2 are the observed 2026-11-06 results, not thresholds bent to pass and
+not a fresh health check. The Step 7 DAG writes separate `scheduled_orders`
+and `scheduled_order_items` prefixes; it does not refresh `python_orders` or
+run the Kafka consumer. A successful daily DAG therefore does not make C1 or
+C2 green. Rerun source freshness separately after operating those two feeds.
 
 ## D. Where the build departs from the design sketch
 

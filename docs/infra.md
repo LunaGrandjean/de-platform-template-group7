@@ -5,12 +5,19 @@ and changed only through it. The course project `data-engineering-i1` is shared
 by every group, so Terraform manages **only our resources** (the `g07_*`
 datasets and our Bronze bucket) and never anything at project level.
 
-Every claim below has a transcript in [`evidence/step8/`](evidence/step8/).
+The original adoption and drift checks have transcripts in
+[`evidence/step8/`](evidence/step8/). On 2026-11-22, Émile confirmed the combined
+Step 9 + 10 apply: labels on the bucket and four datasets, reduced warehouse
+grants, and adoption of the taxonomy and tag readers. He reported checking GCP
+and obtaining a final plan with no changes. That later apply and plan output
+have not been committed; [project status](project-status.md#terraform-apply)
+distinguishes his confirmation from the earlier transcripts.
 
 ## How to run it
 
-Prerequisites: Terraform 1.17.x and your own Google identity
-(`gcloud auth application-default login`). Nobody shares a key; there is none.
+Prerequisites: Terraform 1.17.x and your own Google Application Default
+Credentials; see the [uv setup and ADC requirements](bronze-setup.md#use-uv-without-an-administrator-install).
+Nobody shares a service-account key.
 
 ```bash
 cd infra/terraform
@@ -23,7 +30,8 @@ Every PR touching `infra/terraform/` runs `fmt -check`, `init -backend=false`
 and `validate` in [`.github/workflows/terraform.yml`](../.github/workflows/terraform.yml).
 That check needs no credential. `plan` and `apply` stay manual and
 authenticated: the author pastes the plan output in the PR description, and
-`apply` runs after review, from `main`.
+`apply` normally runs after review, from `main`. The combined Step 9 + 10 apply
+was performed from Anas's branch before its reviewed changes were merged.
 
 ## Resources: one line each, and why it exists
 
@@ -40,14 +48,17 @@ authenticated: the author pastes the plan output in the PR description, and
 | `google_bigquery_dataset_iam_member.warehouse_readers[*]` (4) | Anas, Luna, Malek, Omar, `dataViewer` on `g07_warehouse` | Step 10 narrowed it from `dataEditor`: the Step 4 loads are finished and only the owner rebuilds the warehouse ([governance.md](governance.md#the-narrowed-grant)). |
 | `google_bigquery_dataset_iam_member.silver_owner` | Malek, `dataOwner` on `g07_silver` | First `dbt build` created the dataset under his identity. |
 | `google_bigquery_dataset_iam_member.gold_owner` | Malek, `dataOwner` on `g07_gold` | Same. |
-| `google_service_account.pipeline` + 5 bindings | `g07-pipeline@…` (**not created**, `count = 0`) | The identity Airflow (Step 7) should run the images as, instead of a person. Our accounts lack `iam.serviceAccounts.create` in the shared project (`testIamPermissions`, 2026-11-08). Created once the course admin grants it: set `create_service_account = true`. Grants: `objectUser` on the bucket, `dataEditor` on the four datasets (see below). |
+| `google_data_catalog_taxonomy.g07` and its two policy tags | `g07-marketplace-classification`, `pii-identifier`, `pii-contact` | Classifies personal columns. Existing API-created resources adopted by Terraform in the combined apply, per Émile's 2026-11-22 confirmation. Tag attachment stays with dbt and the warehouse script. |
+| `google_data_catalog_policy_tag_iam_member.identifier_readers[*]` and `contact_readers[*]` | Five named members on each tag | Explicit fine-grained read grants; imported/adopted taxonomy and reader configuration confirmed applied by Émile. Inherited project grants still broaden access ([governance.md](governance.md)). |
+| `google_service_account.pipeline` + 6 bindings | `g07-pipeline@…` (**not created**, conditional resources disabled) | The identity Airflow should use. Requires admin permission; `create_service_account = true` enables it and its two bucket bindings plus four dataset bindings. Grants: bucket metadata read, object access and `dataEditor` on the four datasets (see below). |
+| `google_billing_budget.g07` and its email notification channel | Group-label-scoped budget (**not created**, conditional resources disabled) | Step 9 cost alerts. Requires billing account access; the combined infrastructure apply did not activate it ([costs.md](costs.md#2-budget-alert)). |
 
 **Outside Terraform, on purpose:**
 
 | Resource | Why not in Terraform |
 |---|---|
 | `gs://data-engineering-i1-g07-tfstate` | Holds the state itself; created by hand on 2026-11-08 (versioning on, public access prevention enforced, uniform access). A configuration cannot safely manage the bucket its own state lives in. |
-| Project default bindings (`projectOwners/Writers/Readers` on the datasets, `projectEditor/Viewer` on the bucket) | Inherited from the shared project, owned by the course admin. Declaring them in our state would let our `apply` change other groups' access. They are broader than our matrix needs: gap kept for Step 10. |
+| Project default bindings (`projectOwners/Writers/Readers` on the datasets, `projectEditor/Viewer` on the bucket) | Inherited from the shared project, owned by the course admin. Declaring them in our state would let our `apply` change other groups' access. They remain broader than the Step 10 matrix; the named warehouse grant reduction does not remove them. |
 | The project, APIs, billing | Owned by the course admin. |
 | Tables and views inside the datasets | Created by the code that fills them: Step 4 SQL in `g07_warehouse`, dbt in `g07_silver` and `g07_gold`, and the Step 7 macro [`create_scheduled_orders_table`](../transform/macros/create_scheduled_orders_table.sql) in `g07_bronze`. Terraform owns the containers and who can reach them; declaring the tables too would make two tools fight over the same definitions on every run. |
 | Bronze objects, including `bronze/scheduled/` (Step 7) | Data, not infrastructure. They are covered by the bucket's lifecycle rules (prefix `bronze/`), which are in Terraform. |
@@ -59,14 +70,15 @@ authenticated: the author pastes the plan output in the PR description, and
 Airflow runs the three DAG tasks with the **operator's own Google credentials**,
 copied into the Docker volume `g07_gcloud` ([orchestration.md](orchestration.md)).
 For every member except the owners, Terraform grants only `dataViewer` on
-`g07_bronze` and nothing on `g07_silver` or `g07_gold`, and nothing on the
-bucket for anyone. Yet the runs of 2026-11-16 and 17 succeeded: the writes
-went through the shared project's **default bindings** (`projectWriters` on
-the datasets, `projectEditor` on the bucket), not through anything declared
-here. This is inferred from the grants, not re-checked live: the project's
-billing account was disabled on 2026-11-18, and `terraform plan` returned 403.
-The pipeline therefore depends today on the very bindings we plan to narrow in
-Step 10, and narrowing them first would break it.
+`g07_bronze` and `g07_warehouse`, and no named member write grants on
+`g07_silver`, `g07_gold` or the bucket. The successful operator-credential
+runs therefore depend on the shared project's **default bindings**
+(`projectWriters` on the datasets, `projectEditor` on the bucket), inferred
+from the declared grants. The 2026-11-18 plan failure is historical: Émile
+subsequently applied Steps 9 + 10 and reported a no-change plan on 2026-11-22.
+The four named warehouse roles were reduced; the broad project defaults were
+not removed. Removing those defaults before switching the pipeline identity
+could break its writes.
 
 The service account fixes the order of operations. What each task needs, and
 the binding in [`service_account.tf`](../infra/terraform/service_account.tf)
@@ -91,10 +103,10 @@ Switch-over depends on who creates the account:
   show it as `1 to import`, never `to add` (creating it again fails with 409).
   `import_service_account` can go back to `false` once it is in state.
 
-In both cases: a fresh `plan` first (none has run since billing was disabled on
-2026-11-18), then `apply`, replace the credentials in `g07_gcloud` with the
+In both cases: a fresh `plan` for the identity change first, then `apply`,
+replace the credentials in `g07_gcloud` with the
 account's impersonated credentials (never a key), rerun one day of the DAG, and
-only then remove the personal write paths in Step 10.
+only then ask the admin to narrow the remaining inherited write paths.
 
 ## Adoption: import, not recreate
 
@@ -112,7 +124,8 @@ maps each to its address. On 2026-11-08:
    ([03](evidence/step8/03-plan-after-adopt.txt)).
 
 The state is `gs://data-engineering-i1-g07-tfstate/platform/default.tfstate`
-(17 resources, about 37 KB). Every apply leaves the previous version as a
+(17 resources, about 37 KB at the original adoption; not a current count after
+the Step 10 imports and grants). Every apply leaves the previous version as a
 noncurrent object; GCS locks it during plan/apply.
 
 ## Drift: provoked and detected
@@ -156,8 +169,10 @@ Until then nobody runs `apply`, because it would silently revert the fix.
 - `plan` does not run in CI: that needs a GCP identity for GitHub (Workload
   Identity Federation), which needs the same admin permission as the service
   account.
-- Labels on Silver and Gold, and a budget alert: done in Step 9 (labels on every
-  resource through `default_labels`; the budget is declared but not created, see
-  [costs.md](costs.md#2-budget-alert)).
-- Removing the broad project default bindings: Step 10, and only after the
-  pipeline runs as the service account (see "The pipeline's identity").
+- The budget alert is declared but not created; it still requires the course
+  admin's billing account access ([costs.md](costs.md#2-budget-alert)).
+- Removing broad project default bindings requires the admin and a verified
+  service-account run first. The named warehouse grant reduction is already
+  applied, according to Émile; the inherited bindings remain.
+- Attach the combined apply and no-change plan transcripts reported on
+  2026-11-22 ([project status](project-status.md#terraform-apply)).

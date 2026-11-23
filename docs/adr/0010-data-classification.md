@@ -1,6 +1,6 @@
 # ADR 0010: Grant access to personal columns by their classification, not by table, view or dataset
 
-- **Status:** proposed
+- **Status:** accepted; merged through PR #10 and PR #9 on 2026-11-22. Enforcement gaps remain documented in `docs/governance.md`.
 - **Date:** 2026-11-20
 - **Author:** Anas Mossad, group 7, Step 10 (governance)
 - **Lesson:** L10

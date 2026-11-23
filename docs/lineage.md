@@ -1,13 +1,14 @@
 # Lineage
 
-How data flows from the Bronze tables to the gold star, as dbt sees it. The
-diagram and the table are generated from dbt's own manifest, so they cannot
-drift from the code:
+How data flows from the Bronze tables to the Gold star. The diagram and table
+were updated on 2026-11-23 against the checked-in models' `source()` and
+`ref()` declarations, including the scheduled sources and `int_order_lines`.
+To regenerate them from a fresh dbt manifest:
 
 ```bash
 cd transform
 uv run --locked dbt docs generate --profiles-dir .
-python lineage.py
+uv run --locked python lineage.py
 ```
 
 For the interactive graph with column documentation, run
@@ -20,6 +21,8 @@ flowchart LR
   subgraph sources["Bronze (sources)"]
     source_albert_marketplace_bronze_ingestion_kafka_clickstream["bronze_ingestion.kafka_clickstream"]
     source_albert_marketplace_bronze_ingestion_python_orders["bronze_ingestion.python_orders"]
+    source_albert_marketplace_bronze_ingestion_scheduled_order_items["bronze_ingestion.scheduled_order_items"]
+    source_albert_marketplace_bronze_ingestion_scheduled_orders["bronze_ingestion.scheduled_orders"]
     source_albert_marketplace_bronze_snapshot_customer_shipping["bronze_snapshot.customer_shipping"]
     source_albert_marketplace_bronze_snapshot_order_items["bronze_snapshot.order_items"]
     source_albert_marketplace_bronze_snapshot_orders["bronze_snapshot.orders"]
@@ -37,10 +40,13 @@ flowchart LR
     model_albert_marketplace_stg_product_reviews["stg_product_reviews"]
     model_albert_marketplace_stg_python_orders["stg_python_orders"]
     model_albert_marketplace_stg_review["stg_review"]
+    model_albert_marketplace_stg_scheduled_order_items["stg_scheduled_order_items"]
+    model_albert_marketplace_stg_scheduled_orders["stg_scheduled_orders"]
     model_albert_marketplace_stg_shipping_details["stg_shipping_details"]
   end
   subgraph intermediate["Silver: intermediate"]
     model_albert_marketplace_int_buyer_country["int_buyer_country"]
+    model_albert_marketplace_int_order_lines["int_order_lines"]
     model_albert_marketplace_int_orders_deduplicated["int_orders_deduplicated"]
     model_albert_marketplace_int_product_review_stats["int_product_review_stats"]
   end
@@ -53,19 +59,25 @@ flowchart LR
   end
   model_albert_marketplace_fct_order_items --> model_albert_marketplace_fct_daily_demand
   model_albert_marketplace_int_buyer_country --> model_albert_marketplace_fct_order_items
-  model_albert_marketplace_int_orders_deduplicated --> model_albert_marketplace_fct_order_items
+  model_albert_marketplace_int_order_lines --> model_albert_marketplace_fct_order_items
+  model_albert_marketplace_int_orders_deduplicated --> model_albert_marketplace_int_order_lines
   model_albert_marketplace_int_product_review_stats --> model_albert_marketplace_dim_product
   model_albert_marketplace_stg_customer_shipping --> model_albert_marketplace_int_buyer_country
-  model_albert_marketplace_stg_order_items --> model_albert_marketplace_fct_order_items
+  model_albert_marketplace_stg_order_items --> model_albert_marketplace_int_order_lines
   model_albert_marketplace_stg_order_items --> model_albert_marketplace_int_orders_deduplicated
   model_albert_marketplace_stg_orders --> model_albert_marketplace_int_orders_deduplicated
   model_albert_marketplace_stg_product --> model_albert_marketplace_dim_product
   model_albert_marketplace_stg_product_reviews --> model_albert_marketplace_int_product_review_stats
   model_albert_marketplace_stg_review --> model_albert_marketplace_int_product_review_stats
+  model_albert_marketplace_stg_scheduled_order_items --> model_albert_marketplace_int_order_lines
+  model_albert_marketplace_stg_scheduled_orders --> model_albert_marketplace_int_order_lines
+  model_albert_marketplace_stg_scheduled_orders --> model_albert_marketplace_stg_scheduled_order_items
   model_albert_marketplace_stg_shipping_details --> model_albert_marketplace_dim_country
   model_albert_marketplace_stg_shipping_details --> model_albert_marketplace_int_buyer_country
   source_albert_marketplace_bronze_ingestion_kafka_clickstream --> model_albert_marketplace_stg_kafka_clickstream
   source_albert_marketplace_bronze_ingestion_python_orders --> model_albert_marketplace_stg_python_orders
+  source_albert_marketplace_bronze_ingestion_scheduled_order_items --> model_albert_marketplace_stg_scheduled_order_items
+  source_albert_marketplace_bronze_ingestion_scheduled_orders --> model_albert_marketplace_stg_scheduled_orders
   source_albert_marketplace_bronze_snapshot_customer_shipping --> model_albert_marketplace_stg_customer_shipping
   source_albert_marketplace_bronze_snapshot_order_items --> model_albert_marketplace_stg_order_items
   source_albert_marketplace_bronze_snapshot_orders --> model_albert_marketplace_stg_orders
@@ -79,9 +91,11 @@ flowchart LR
 |---|---:|---|
 | `bronze_ingestion.kafka_clickstream` | 1 | none |
 | `bronze_ingestion.python_orders` | 1 | none |
+| `bronze_ingestion.scheduled_order_items` | 4 | `fct_daily_demand`, `fct_order_items` |
+| `bronze_ingestion.scheduled_orders` | 5 | `fct_daily_demand`, `fct_order_items` |
 | `bronze_snapshot.customer_shipping` | 4 | `fct_daily_demand`, `fct_order_items` |
-| `bronze_snapshot.order_items` | 4 | `fct_daily_demand`, `fct_order_items` |
-| `bronze_snapshot.orders` | 4 | `fct_daily_demand`, `fct_order_items` |
+| `bronze_snapshot.order_items` | 5 | `fct_daily_demand`, `fct_order_items` |
+| `bronze_snapshot.orders` | 5 | `fct_daily_demand`, `fct_order_items` |
 | `bronze_snapshot.product` | 2 | `dim_product` |
 | `bronze_snapshot.product_reviews` | 3 | `dim_product` |
 | `bronze_snapshot.review` | 3 | `dim_product` |
@@ -90,7 +104,8 @@ flowchart LR
 
 ## If the most upstream source changed shape tomorrow
 
-The most upstream sources are the seven snapshot tables in `g07_bronze`. Say
+The inputs include the seven snapshot tables and the scheduled/ingestion
+external tables in `g07_bronze`. Say
 `order_items` changes: a column is renamed, a price starts using a comma, or a
 new column appears. What to look at, in order:
 
@@ -109,9 +124,13 @@ new column appears. What to look at, in order:
    `quantity` and `unit_price_eur` to recognise twins. A format drift that is
    applied to only some rows would make two copies of an order stop matching.
    `assert_dedup_halves_orders` and `assert_twin_groups_are_even` fail first.
-4. **Then the facts.** `fct_order_items` and `fct_daily_demand` read only the
-   staged columns. `assert_reconciled_lines_preserved` and the grain tests tell
-   you whether sales were lost or repeated.
+4. **`int_order_lines`, then the facts.** Snapshot orders before 2026-09-15
+   and scheduled orders from that date join their respective lines here.
+   `fct_order_items` reads this combined model and `fct_daily_demand` aggregates
+   it. `assert_reconciled_lines_preserved`, `assert_scheduled_orders_reach_gold`
+   and the grain tests tell you whether sales were lost or repeated. For a
+   scheduled-source change, start instead at the external-table macro and
+   `stg_scheduled_orders` / `stg_scheduled_order_items`.
 
 The table above gives the blast radius. `order_items` and `orders` reach both
 facts, so a break there stops the star; `review` and `product_reviews` reach

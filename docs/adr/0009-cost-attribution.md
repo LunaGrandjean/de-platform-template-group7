@@ -1,6 +1,6 @@
 # ADR 0009: Attribute spend by labels on every resource and every job, in the shared project
 
-- **Status:** proposed
+- **Status:** accepted; merged into `main` through PR #9 on 2026-11-22. Budget activation remains pending (see `docs/costs.md`).
 - **Date:** 2026-11-19
 - **Author:** Anas Mossad, group 7, Step 9 (FinOps)
 - **Lesson:** L09

@@ -1,12 +1,15 @@
 # Governance: classified, restricted, and erasable (Step 10)
 
 What every column in our warehouse is, who may read it, what we enforced, and
-what we could not. Measured on 2026-11-20 in the shared project
-`data-engineering-i1`; every claim links to a file in
-[`evidence/step10/`](evidence/step10/).
+what we could not. The inventory and access checks were measured on 2026-11-20
+in the shared project `data-engineering-i1`; dated records are in
+[`evidence/step10/`](evidence/step10/). Updated 2026-11-23 to include Émile's
+confirmation of the combined Terraform apply on 2026-11-22. Its apply and
+final plan transcripts are still to be attached
+([source and evidence limits](project-status.md#terraform-apply)).
 
 **The short version.** 196 columns, each with a class and an owner (section 3).
-Two columns carry a policy tag that BigQuery enforces: `buyer_id` in
+Two columns carry a fine-grained policy tag: `buyer_id` in
 `g07_warehouse.orders` and in `g07_gold.fct_order_items`. The two columns that
 matter most, the street address and phone in Bronze, **could not be tagged**:
 BigQuery refuses policy tags on plain external tables. And we could not show a
@@ -328,9 +331,15 @@ dataViewer** ([`iam.tf`](../infra/terraform/iam.tf), `warehouse_readers`).
   nothing done by hand. The same plan imports the taxonomy and both tags with
   no diff: `3 to import, 14 to add, 5 to change, 4 to destroy`, of which the
   5 changes are Step 9's labels.
-- **Not live yet:** none of us can change dataset IAM on `g07_warehouse`
-  except Émile, and `apply` is blocked on Terraform 1.17 (Step 9 has the same
-  blocker).
+- **Applied, per operator confirmation:** on 2026-11-22 Émile reported the
+  combined Step 9 + 10 apply, verified the four warehouse `dataViewer` grants
+  in GCP, imported the taxonomy and tags, applied the five members' tag-reader
+  access, and obtained a final plan with no changes. The older plan above is
+  kept as pre-apply evidence; the apply and final plan transcripts are not yet
+  committed ([project status](project-status.md#terraform-apply)).
+- **Effective access remains broader:** reducing these named dataset grants
+  does not remove inherited project write permissions or course-wide
+  fine-grained read access. The refusal check in section 5 is still pending.
 - **Writing again:** ask Émile for a time-boxed dataEditor through a PR on
   `iam.tf`, and revert it afterwards.
 
@@ -365,9 +374,11 @@ A documented gap is a finding. These are ours, worst first.
      and `setIamPolicy`. They are inherited from above the taxonomy,
      presumably a project-level grant so every group could run the course
      demo.
-   - The matrix says an analyst cannot read `pii.identifier`. That holds for
-     anyone without the project-level role, and we have no such account to
-     prove it with.
+   - The matrix requires an analyst to be denied `pii.identifier`. We still
+     need an identity with table access but no explicit or inherited
+     fine-grained tag-reader permission to verify that requirement. Émile
+     confirmed the same limitation after the 2026-11-22 apply; the group
+     cannot create a separate service account to test it.
    - **What would close it:** someone outside the course's student grant (the
      admin, or a test account) runs
      `SELECT buyer_id FROM g07_gold.fct_order_items LIMIT 1` and should get
